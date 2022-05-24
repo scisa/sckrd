@@ -1,5 +1,6 @@
 pub mod cli;
 pub mod input;
+pub mod calculation;
 pub mod util;
 
 use cli::arguments::Args;
