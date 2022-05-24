@@ -10,8 +10,6 @@ use crate::cli::arg_constants::*;
 pub struct Args {
     input_file: String,
     output_file: bool,
-    verbose: bool,
-    statebar: bool,
 }
 
 impl Args {
@@ -25,8 +23,6 @@ impl Args {
         Self {
             input_file: Self::extract_input_file(&args),
             output_file: Self::extract_output_file(&args),
-            verbose: Self::extract_verbose(&args),
-            statebar: Self::extract_statebar(&args),
         }
     }
 
@@ -54,24 +50,6 @@ impl Args {
                 .takes_value(false)
                 .long(LONG_ARG_OUTPUT_FILE)
             )
-            .arg(
-                Arg::new(KEY_VERBOSE)
-                .help(HELP_VERBOSE)
-                .value_name(VALUE_VERBOSE)
-                .required(false)
-                .short('v')
-                .takes_value(false)
-                .long(LONG_ARG_VERBOSE)
-            )
-            .arg(
-                Arg::new(KEY_STATEBAR)
-                    .help(HELP_STATEBAR)
-                    .value_name(VALUE_STATEBAR)
-                    .required(false)
-                    .short('s')
-                    .takes_value(false)
-                    .long(LONG_ARG_STATEBAR),
-            )
             .get_matches();
         Ok(matches)
     }
@@ -82,13 +60,5 @@ impl Args {
 
     fn extract_output_file(args: &ArgMatches) -> bool {
         args.is_present(KEY_OUTPUT_FILE)
-    }
-
-    fn extract_verbose(args: &ArgMatches) -> bool {
-        args.is_present(KEY_VERBOSE)
-    }
-
-    fn extract_statebar(args: &ArgMatches) -> bool {
-        args.is_present(KEY_STATEBAR)
     }
 }
