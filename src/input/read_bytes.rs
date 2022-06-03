@@ -1,7 +1,17 @@
 use std::io::{self, Read, BufRead, BufReader};
 use std::fs::File;
 
-pub fn read_bytes_to_vector(path: &str) -> io::Result<Vec<u8>> {
+use crate::util::exit_codes::*;
+
+pub fn get_bytes(path: &str) -> Vec<u8> {
+    match read_bytes_to_vector(&path) {
+        Ok(b) => b,
+        Err(_) => std::process::exit(EXIT_READ_BYTES_TO_VECTOR_FAILED),
+    }
+}
+
+
+fn read_bytes_to_vector(path: &str) -> io::Result<Vec<u8>> {
     let file = File::open(path)?;
     let mut reader = BufReader::new(file);
     let mut buffer: Vec<u8> = Vec::new();

@@ -47,3 +47,4 @@ Cargo.lock
 
 # project specific
 *.lime
+*.sckrd
