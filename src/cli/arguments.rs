@@ -13,6 +13,9 @@ pub struct Args {
     pub keysize: usize,
     pub timer: bool,
     pub thread_count: usize,
+    pub basic_output: bool,
+    pub verbose: bool,
+    pub byte_count: usize,
 }
 
 impl Args {
@@ -32,6 +35,9 @@ impl Args {
             keysize: Self::extract_keysize(&args),
             timer: Self::extract_timer(&args),
             thread_count: Self::extract_thread_count(&args),
+            basic_output: Self::extract_basic_output(&args),
+            verbose: Self::extract_verbose(&args),
+            byte_count: Self::extract_byte_count(&args),
         }
     }
 
@@ -87,6 +93,35 @@ impl Args {
                     .long(LONG_ARG_THREAD_COUNT)
                     .default_value(DEFAULT_VALUE_THREAD_COUNT),
             )
+            .arg(
+                Arg::new(KEY_BASIC_OUTPUT)
+                    .help(HELP_BASIC_OUTPUT)
+                    .value_name(VALUE_BASIC_OUTPUT)
+                    .required(false)
+                    .short('p')
+                    .takes_value(false)
+                    .long(LONG_ARG_BASIC_OUTPUT),
+            )
+            .arg(
+                Arg::new(KEY_VERBOSE)
+                    .help(HELP_VERBOSE)
+                    .value_name(VALUE_VERBOSE)
+                    .required(false)
+                    .short('v')
+                    .takes_value(false)
+                    .long(LONG_ARG_VERBOSE)
+                    .conflicts_with(KEY_BASIC_OUTPUT),
+            )
+            .arg(
+                Arg::new(KEY_BYTE_COUNT)
+                    .help(HELP_BYTE_COUNT)
+                    .value_name(VALUE_BYTE_COUNT)
+                    .required(false)
+                    .short('b')
+                    .takes_value(true)
+                    .long(LONG_ARG_BYTE_COUNT)
+                    .default_value(DEFAULT_VALUE_BYTE_COUNT),
+            )
             .get_matches();
         Ok(matches)
     }
@@ -121,6 +156,25 @@ impl Args {
             Err(_) => {
                 eprintln!("{}", ERROR_THREAD_COUNT_NOT_U32);
                 std::process::exit(EXIT_THREAD_COUNT_ARG_IS_UNSIGNED_INT)
+            }
+        }
+    }
+
+    fn extract_basic_output(args: &ArgMatches) -> bool {
+        args.is_present(KEY_BASIC_OUTPUT)
+    }
+
+    fn extract_verbose(args: &ArgMatches) -> bool {
+        args.is_present(KEY_VERBOSE)
+    }
+
+    fn extract_byte_count(args: &ArgMatches) -> usize {
+        let string_byte_count = args.value_of(KEY_BYTE_COUNT).unwrap().to_string();
+        match string_byte_count.parse::<usize>() {
+            Ok(k) => k,
+            Err(_) => {
+                eprintln!("{}", ERROR_BYTE_COUNT_NOT_U32);
+                std::process::exit(EXIT_BYTE_COUNT_ARG_IS_UNSIGNED_INT)
             }
         }
     }
