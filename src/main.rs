@@ -13,12 +13,12 @@ fn main() {
     let args = Args::get_args();
 
     let timer = time::timer::Timer::new();
-    let bytes: Vec<u8> = input::read_bytes::get_bytes(args.input_file.as_str());
+    let mut bytes: Vec<u8> = input::read_bytes::get_bytes(args.input_file.as_str());
 
     let key_length_byte: usize = args.keysize / 8;
     let bytes_length = bytes.len();
     let split_vec: Vec<Vec<u8>> =
-        calculation::parallelism::split_bytes_vector(&bytes, key_length_byte, args.thread_count);
+        calculation::parallelism::split_bytes_vector(&mut bytes, key_length_byte, args.thread_count);
 
     // create variables for threading
     let bytes_arc = Arc::new(split_vec);
@@ -52,7 +52,7 @@ fn thread_function(bytes_arc: Arc<Vec<Vec<u8>>>, key_length_byte: usize, current
     for j in 0..(bytes_length - key_length_byte) {
         let mut scope_vec: Vec<u8> = vec![0; key_length_byte];
         scope_vec.copy_from_slice(&bytes_arc[current_thread][j..(j + key_length_byte)]);
-        if calculation::exclution::contains_no_hash_characters(&scope_vec) {
+        if calculation::exclution::contains_non_hash_characters(&scope_vec) {
             let entropy: f32 = calculation::entropy::calc_entropy_per_key_attempt(&scope_vec);
             if calculation::entropy::is_high_entropy(entropy) {
                 if let Ok(crypto_key) = std::str::from_utf8(&scope_vec) {

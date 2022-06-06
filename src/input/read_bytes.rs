@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, Read};
+use std::io::{self, BufReader, Read};
 
 use crate::util::exit_codes::*;
 
