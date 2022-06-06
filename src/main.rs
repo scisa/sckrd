@@ -15,14 +15,19 @@ fn main() {
 
     let timer = time::timer::Timer::new();
     let mut bytes: Vec<u8> = input::read_bytes::get_bytes(args.input_file.as_str(), args.byte_count);
-    println!("{}", bytes.len());
+    // println!("{}", bytes.len());
 
     let key_length_byte: usize = args.keysize / 8;
     let bytes_length = bytes.len();
+    let mut thread_count = args.thread_count;
+
+    while (bytes_length / thread_count) < key_length_byte {
+        thread_count /= 2;
+    }
 
     if bytes_length > key_length_byte {
         let split_vec: Vec<Vec<u8>> =
-        calculation::parallelism::split_bytes_vector(&mut bytes, key_length_byte, args.thread_count);
+        calculation::parallelism::split_bytes_vector(&mut bytes, key_length_byte, thread_count);
         let split_vec_len: usize = split_vec.len();
 
         // create write options
@@ -37,10 +42,9 @@ fn main() {
 
         // run entropy analysis
         if bytes_length >= key_length_byte {  
-            if split_vec_len == args.thread_count && args.thread_count > 1 {
+            if split_vec_len == thread_count && thread_count > 1 {
                 let mut thread_handles = vec![];
-                println!("there");
-                for current_thread in 0..args.thread_count {
+                for current_thread in 0..thread_count {
                     let bytes_arc = Arc::clone(&bytes_arc);
                     let write_options_arc = Arc::clone(&write_options_arc);
                     thread_handles.push(std::thread::spawn(move || {

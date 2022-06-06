@@ -13,13 +13,14 @@ pub fn split_bytes_vector_bak(bytes: &Vec<u8>, _key_length_byte: usize, n: usize
 
 pub fn split_bytes_vector(bytes: &mut Vec<u8>, key_length_byte: usize, n: usize) -> Vec<Vec<u8>> {
     let mut bytes_len: usize = bytes.len();
+    let bytes_len_init: usize = bytes.len();
     let mut split_vec: Vec<Vec<u8>> = Vec::new();
     let mut overlap_vector: Vec<u8>;
 
-    if bytes_len > key_length_byte * 8 {
+    if bytes_len > key_length_byte * 8 && n > 1{
         for i in 0..n {
             if bytes_len >= n {
-                let mut temp_vec: Vec<u8> = bytes.split_off(bytes_len - (bytes_len / 8));
+                let mut temp_vec: Vec<u8> = bytes.split_off(bytes_len - (bytes_len_init / n));
                 if !split_vec.is_empty() {
                     overlap_vector = create_overlap(&split_vec, key_length_byte, i);
                     temp_vec.append(&mut overlap_vector);
@@ -38,7 +39,7 @@ pub fn split_bytes_vector(bytes: &mut Vec<u8>, key_length_byte: usize, n: usize)
         split_vec.push(bytes.to_vec());
     }
     
-
+    println!("{:?}", split_vec);
     split_vec
 }
 
@@ -65,16 +66,6 @@ pub fn split_bytes_vector(bytes: &mut Vec<u8>, key_length_byte: usize, n: usize)
 fn create_overlap(split_vec: &Vec<Vec<u8>>, key_length_byte: usize, current_thread: usize,) -> Vec<u8> {
     let mut overlap_vector: Vec<u8> = vec![0; key_length_byte];
     overlap_vector.copy_from_slice(&split_vec[current_thread - 1][0..key_length_byte]);
-
-    // let len_overlap: usize = split_vec[current_thread - 1].len();
-    // let overlap_vector: Vec<u8> = Vec::new();
-    // if len_overlap >= key_length_byte {
-    //     let mut overlap_vector: Vec<u8> = vec![0; key_length_byte];
-    //     overlap_vector.copy_from_slice(&split_vec[current_thread - 1][0..key_length_byte]);
-    // } else {
-    //     let mut overlap_vector: Vec<u8> = vec![0; len_overlap];
-    //     overlap_vector.copy_from_slice(&split_vec[current_thread - 1][0..len_overlap]);
-    // }
 
     overlap_vector
 }
