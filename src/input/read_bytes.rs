@@ -1,5 +1,5 @@
-use std::io::{self, Read, BufRead, BufReader};
 use std::fs::File;
+use std::io::{self, BufRead, BufReader, Read};
 
 use crate::util::exit_codes::*;
 
@@ -10,15 +10,14 @@ pub fn get_bytes(path: &str) -> Vec<u8> {
     }
 }
 
-
 fn read_bytes_to_vector(path: &str) -> io::Result<Vec<u8>> {
     let file = File::open(path)?;
     let mut reader = BufReader::new(file);
     let mut buffer: Vec<u8> = Vec::new();
-    
+
     // Read file into vector.
     reader.read_to_end(&mut buffer)?;
-    
+
     Ok(buffer)
 }
 

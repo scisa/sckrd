@@ -1,10 +1,10 @@
+use std::fs::{self, File, OpenOptions};
 use std::io::Write;
-use std::fs::{self, OpenOptions, File};
 use std::path::Path;
 
-use crate::util::global_constants::*;
-use crate::util::exit_codes::*;
 use crate::util::error_messages::*;
+use crate::util::exit_codes::*;
+use crate::util::global_constants::*;
 
 pub fn write(crypto_key: &str, entropy: f32, is_output_file: bool) {
     write_to_stdout(crypto_key, entropy);
@@ -18,12 +18,16 @@ fn write_to_stdout(crypto_key: &str, entropy: f32) {
 }
 
 fn write_to_file(crypto_key: &str, entropy: f32) {
-    let mut file = match OpenOptions::new().write(true).append(true).open(OUTPUT_FILE_PATH) {
+    let mut file = match OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(OUTPUT_FILE_PATH)
+    {
         Ok(f) => f,
         Err(_) => {
-            eprintln!("{} ./{}", ERROR_OUTPUT_FILE_NOT_WRITEABLE,  OUTPUT_FILE_PATH);
+            eprintln!("{} ./{}", ERROR_OUTPUT_FILE_NOT_WRITEABLE, OUTPUT_FILE_PATH);
             std::process::exit(EXIT_OUTPUT_FILE_NOT_WRITEABLE)
-        },
+        }
     };
 
     if let Err(e) = writeln!(file, "{}: {}", crypto_key, entropy) {
@@ -54,8 +58,11 @@ fn create_output_file() {
     match File::create(OUTPUT_FILE_PATH) {
         Ok(f) => f,
         Err(_) => {
-            eprintln!("{} ./{}", ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE, OUTPUT_FILE_PATH);
+            eprintln!(
+                "{} ./{}",
+                ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE, OUTPUT_FILE_PATH
+            );
             std::process::exit(EXIT_OUTPUT_FILE_NOT_WRITEABLE)
-        },
+        }
     };
 }

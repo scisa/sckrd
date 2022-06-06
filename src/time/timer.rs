@@ -4,7 +4,6 @@ pub struct Timer {
     start: Instant,
 }
 
-
 impl Timer {
     pub fn new() -> Self {
         Self {

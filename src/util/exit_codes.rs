@@ -1,6 +1,7 @@
 // src/cli/arguments.rs
 pub const EXIT_EXTRACTING_ARGS_FAILED: i32 = 2;
-pub const EXIT_KEY_SIZE_ARG_IS_UNSIGNED_INT: i32 = 3;
+pub const EXIT_KEYSIZE_ARG_IS_UNSIGNED_INT: i32 = 3;
+pub const EXIT_THREAD_COUNT_ARG_IS_UNSIGNED_INT: i32 = 4;
 
 pub const EXIT_READ_BYTES_TO_VECTOR_FAILED: i32 = 10;
 

@@ -19,3 +19,9 @@ pub const KEY_TIMER: &str = "timer";
 pub const HELP_TIMER: &str = "show elapsed time";
 pub const VALUE_TIMER: &str = "TIMER";
 pub const LONG_ARG_TIMER: &str = "timer";
+
+pub const KEY_THREAD_COUNT: &str = "thread_count";
+pub const HELP_THREAD_COUNT: &str = "number of threads";
+pub const VALUE_THREAD_COUNT: &str = "THREAD_COUNT";
+pub const LONG_ARG_THREAD_COUNT: &str = "thread-count";
+pub const DEFAULT_VALUE_THREAD_COUNT: &str = "8";
