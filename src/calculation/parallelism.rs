@@ -48,6 +48,9 @@ fn create_overlap(split_vec: &Vec<Vec<u8>>, key_length_byte: usize, current_thre
 }
 
 pub fn calc_thread_count(bytes_length: usize, mut thread_count: usize, key_length_byte: usize) -> usize{
+    if thread_count == 0 {
+        thread_count = 1;
+    }
     while (bytes_length / thread_count) < key_length_byte {
         thread_count /= 2;
     }
