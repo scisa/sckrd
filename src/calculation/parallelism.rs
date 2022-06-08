@@ -56,3 +56,63 @@ pub fn calc_thread_count(bytes_length: usize, mut thread_count: usize, key_lengt
     }
     thread_count
 }
+
+
+#[test]
+fn calc_thread_count_0() {
+    // bytes_length >= key_length_byte
+    // key_length_byte >= 8
+    assert_eq!(calc_thread_count(500, 0, 32), 1);
+    assert_eq!(calc_thread_count(32, 0, 32), 1);
+    assert_eq!(calc_thread_count(150, 0, 32), 1);
+}
+
+#[test]
+fn calc_thread_count_very_high_but_equal_bytes_length() {
+    assert_eq!(calc_thread_count(500, 500, 32), 15);
+}
+
+#[test]
+fn calc_thread_count_very_high_but_lower_bytes_length() {
+    assert_eq!(calc_thread_count(500, 600, 32), 9);
+}
+
+#[test]
+fn calc_thread_count_very_high_but_higher_bytes_length() {
+    assert_eq!(calc_thread_count(500, 400, 32), 12);
+}
+
+#[test]
+fn calc_thread_count_1() {
+    assert_eq!(calc_thread_count(500, 1, 32), 1);
+}
+
+#[test]
+fn calc_thread_count_2() {
+    assert_eq!(calc_thread_count(500, 2, 32), 2);
+}
+
+#[test]
+fn calc_thread_count_4() {
+    assert_eq!(calc_thread_count(500, 4, 32), 4);
+}
+
+#[test]
+fn calc_thread_count_8() {
+    assert_eq!(calc_thread_count(500, 8, 32), 8);
+}
+
+#[test]
+fn calc_thread_count_15() {
+    assert_eq!(calc_thread_count(500, 15, 32), 15);
+}
+
+#[test]
+fn calc_thread_count_16() {
+    assert_eq!(calc_thread_count(500, 16, 32), 8);
+}
+
+#[test]
+fn calc_thread_count_32() {
+    assert_eq!(calc_thread_count(500, 32, 32), 8);
+}

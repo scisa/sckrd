@@ -7,6 +7,7 @@ use crate::output;
 use crate::cli::arguments::Args;
 use crate::time::timer::Timer;
 use crate::output::write_ck::WriteOptions;
+use crate::util::global_constants::SMALLEST_KEY_LENGTH_BIT;
 
 
 
@@ -25,7 +26,7 @@ pub fn run() {
     let bytes_length = bytes.len();
     
     // check if analysation has to be done
-    if bytes_length >= key_length_byte {
+    if bytes_length >= key_length_byte && args.keysize >= SMALLEST_KEY_LENGTH_BIT {
         
         // calculate number of parallel tasks
         let thread_count = calculation::parallelism::calc_thread_count(bytes_length, args.thread_count, key_length_byte);
@@ -70,7 +71,6 @@ fn analyse_bytes_dump(split_vector_arc: Arc<Vec<Vec<u8>>>, write_options_arc: Ar
         run_entropy_analysis(split_vector_arc, key_length_byte, 0, &write_options_arc);
     }
 }
-
 
 
 fn run_entropy_analysis(bytes_arc: Arc<Vec<Vec<u8>>>, key_length_byte: usize, current_thread: usize, write_options: &WriteOptions) {
