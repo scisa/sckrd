@@ -1,4 +1,4 @@
-use crate::util::global_constants::*;
+use crate::util::global_constants::ENTROPY_BORDER;
 
 pub fn calc_entropy_per_key_attempt(scope_vec: &Vec<u8>) -> f32 {
     entropy::shannon_entropy(&scope_vec)
