@@ -41,3 +41,28 @@ fn read_specific_number_of_bytes_to_vector(path: &str, byte_count: usize) -> io:
 
     Ok(buffer)
 }
+
+
+#[test]
+fn get_specific_bytes_smaller_than_file() {
+    let path: &str = "tests/inputs/test_small.bin";
+    assert_eq!(get_bytes(path, 300).len(), 300);
+}
+
+#[test]
+fn get_specific_bytes_equal_than_file() {
+    let path: &str = "tests/inputs/test_small.bin";
+    assert_eq!(get_bytes(path, 357).len(), 357);
+}
+
+#[test]
+fn get_specific_bytes_bigger_than_file() {
+    let path: &str = "tests/inputs/test_small.bin";
+    assert_eq!(get_bytes(path, 500).len(), 357);
+}
+
+#[test]
+fn get_specific_bytes_0() {
+    let path: &str = "tests/inputs/test_small.bin";
+    assert_eq!(get_bytes(path, 0).len(), 357);
+}
