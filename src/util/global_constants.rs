@@ -5,7 +5,7 @@ pub const APP_AUTHOR: &str = "scisa <scisa@web.de>";
 pub const APP_DESCRIPTION: &str = "search crypto keys in ram dumps";
 
 // calculation
-pub const ENTROPY_BORDER: f32 = 4.60;
+pub const ENTROPY_BOUNDARY: f32 = 4.60;
 pub const SMALLEST_KEY_LENGTH_BIT: usize = 64;
 
 //output

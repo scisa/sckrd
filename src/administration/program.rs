@@ -33,7 +33,7 @@ pub fn run() {
         
         // split vector into pieces for threading
         let split_vec: Vec<Vec<u8>> =
-        calculation::parallelism::split_bytes_vector(&mut bytes, key_length_byte, thread_count);
+        calculation::parallelism::split_bytes_vector_for_threading(&mut bytes, key_length_byte, thread_count);
 
         // create write options
         let write_options: WriteOptions = WriteOptions::new(args.output_file, args.basic_output, args.verbose);
@@ -45,7 +45,7 @@ pub fn run() {
         // recreate output.sckrd if necessary
         output::write_ck::recreate_output_file(args.output_file);
 
-        // run entropy analysis
+        // analyse bytes dump
         analyse_bytes_dump(split_vector_arc, write_options_arc, thread_count, key_length_byte);
     }
     
@@ -78,9 +78,9 @@ fn run_entropy_analysis(bytes_arc: Arc<Vec<Vec<u8>>>, key_length_byte: usize, cu
     for j in 0..(bytes_length - key_length_byte) {
         let mut scope_vec: Vec<u8> = vec![0; key_length_byte];
         scope_vec.copy_from_slice(&bytes_arc[current_thread][j..(j + key_length_byte)]);
-        if calculation::exclution::contains_non_hash_characters(&scope_vec) {
-            let entropy: f32 = calculation::entropy::calc_entropy_per_key_attempt(&scope_vec);
-            if calculation::entropy::is_high_entropy(entropy) {
+        if calculation::exclution::contains_no_non_hash_characters(&scope_vec) {
+            let entropy: f32 = calculation::entropy::calc_entropy_per_candidate_key(&scope_vec);
+            if calculation::entropy::has_high_entropy(entropy) {
                 if let Ok(crypto_key) = std::str::from_utf8(&scope_vec) {
                     output::write_ck::write(crypto_key, entropy, key_length_byte ,write_options);
                 }
