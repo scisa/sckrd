@@ -65,7 +65,6 @@ fn thread_count_8() -> TestResult {
     Ok(())
 }
 
-
 #[test]
 fn thread_count_16() -> TestResult {
     let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
@@ -101,11 +100,11 @@ fn thread_count_range() -> TestResult {
 
     for i in 0..32 {
         Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500", "-n", &(i.to_string())])
-        .assert()
-        .stdout(predicate::str::contains(output_00))
-        .stdout(predicate::str::contains(output_01));
+            .args(&["-i", TEST_SMALL, "-b", "500", "-n", &(i.to_string())])
+            .assert()
+            .stdout(predicate::str::contains(output_00))
+            .stdout(predicate::str::contains(output_01));
     }
-    
+
     Ok(())
 }

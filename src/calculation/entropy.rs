@@ -28,6 +28,8 @@ fn is_high_entropy_no() {
 
 #[test]
 fn calc_entropy_for_scope_vector() {
-    let scope_vec: Vec<u8> = vec![23, 38, 44, 11, 47, 13, 20, 18, 4, 90, 89, 64, 220, 138, 136, 180, 24, 254, 8, 88];
+    let scope_vec: Vec<u8> = vec![
+        23, 38, 44, 11, 47, 13, 20, 18, 4, 90, 89, 64, 220, 138, 136, 180, 24, 254, 8, 88,
+    ];
     assert_eq!(calc_entropy_per_candidate_key(&scope_vec), 4.321928);
 }

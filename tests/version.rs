@@ -12,7 +12,7 @@ fn version_plain_short() -> TestResult {
         .args(&["-V"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -22,7 +22,7 @@ fn version_plain_long() -> TestResult {
         .args(&["--version"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -32,7 +32,7 @@ fn version_beside_short() -> TestResult {
         .args(&["-p", "-n", "8", "-V"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -42,7 +42,7 @@ fn version_beside_long() -> TestResult {
         .args(&["-p", "-n", "8", "--version"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -52,7 +52,7 @@ fn version_short_beside_help_short() -> TestResult {
         .args(&["-V", "-h"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -62,7 +62,7 @@ fn version_long_beside_help_short() -> TestResult {
         .args(&["--version", "-h"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -72,7 +72,7 @@ fn version_short_beside_help_long() -> TestResult {
         .args(&["-V", "--help"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }
 
@@ -82,6 +82,6 @@ fn version_long_beside_help_long() -> TestResult {
         .args(&["--version", "--help"])
         .assert()
         .stdout(predicate::str::contains("sckrd 0.1.0"));
-    
+
     Ok(())
 }

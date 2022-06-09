@@ -12,7 +12,7 @@ fn help_plain_short() -> TestResult {
         .args(&["-h"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -22,7 +22,7 @@ fn help_plain_long() -> TestResult {
         .args(&["--help"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -32,7 +32,7 @@ fn help_beside_short() -> TestResult {
         .args(&["-p", "-n", "8", "-h"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -42,7 +42,7 @@ fn help_beside_long() -> TestResult {
         .args(&["-p", "-n", "8", "--help"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -52,7 +52,7 @@ fn help_short_beside_version_short() -> TestResult {
         .args(&["-h", "-V"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -62,7 +62,7 @@ fn help_long_beside_version_short() -> TestResult {
         .args(&["--help", "-V"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -72,7 +72,7 @@ fn help_short_beside_version_long() -> TestResult {
         .args(&["-h", "--version"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }
 
@@ -82,6 +82,6 @@ fn help_long_beside_version_long() -> TestResult {
         .args(&["--help", "--version"])
         .assert()
         .stdout(predicate::str::contains("USAGE"));
-    
+
     Ok(())
 }

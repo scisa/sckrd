@@ -6,7 +6,6 @@ use crate::util::error_messages::*;
 use crate::util::exit_codes::*;
 use crate::util::global_constants::*;
 
-
 pub struct WriteOptions {
     pub is_output_file: bool,
     pub is_basic_output: bool,
@@ -30,12 +29,20 @@ pub fn write(crypto_key: &str, entropy: f32, key_length_byte: usize, write_optio
     }
 }
 
-fn write_to_stdout(crypto_key: &str, entropy: f32, key_length_byte: usize, write_options: &WriteOptions) {
+fn write_to_stdout(
+    crypto_key: &str,
+    entropy: f32,
+    key_length_byte: usize,
+    write_options: &WriteOptions,
+) {
     if write_options.is_basic_output {
         println!("{}", crypto_key);
     } else {
         if write_options.is_verbose {
-            println!("Possible Key: {}\t\tEntropy: {}\t\tSize (Byte): {}", crypto_key, entropy, key_length_byte);
+            println!(
+                "Possible Key: {}\t\tEntropy: {}\t\tSize (Byte): {}",
+                crypto_key, entropy, key_length_byte
+            );
         } else {
             println!("{}: {}", crypto_key, entropy);
         }
