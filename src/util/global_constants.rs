@@ -9,7 +9,7 @@ pub const ENTROPY_BOUNDARY: f32 = 4.60;
 pub const SMALLEST_KEY_LENGTH_BIT: usize = 64;
 
 //output
-pub const OUTPUT_FILE_PATH: &str = "output.sckrd";
+pub const OUTPUT_FILE_PATH: &str = "./sckrd.keys";
 
 // chars never in hashes
 pub const BYTE_NEWLINE: u8 = 10; //\n

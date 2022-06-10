@@ -1,10 +1,11 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
+use std::sync::{Mutex, Arc};
 
 use crate::util::error_messages::*;
 use crate::util::exit_codes::*;
-use crate::util::global_constants::*;
+use crate::util::global_constants::OUTPUT_FILE_PATH;
 
 pub struct WriteOptions {
     pub is_output_file: bool,
@@ -22,10 +23,10 @@ impl WriteOptions {
     }
 }
 
-pub fn write(crypto_key: &str, entropy: f32, key_length_byte: usize, write_options: &WriteOptions) {
-    write_to_stdout(crypto_key, entropy, key_length_byte, write_options);
+pub fn write(crypto_key: &str, entropy: f32, key_length_byte: usize, write_options: &WriteOptions, file: Arc<Mutex<File>>) {
+    write_to_stdout(crypto_key, entropy, key_length_byte, &write_options);
     if write_options.is_output_file {
-        write_to_file(crypto_key, entropy)
+        write_to_file(crypto_key, entropy, file)
     }
 }
 
@@ -49,52 +50,35 @@ fn write_to_stdout(
     }
 }
 
-fn write_to_file(crypto_key: &str, entropy: f32) {
-    let mut file = match OpenOptions::new()
+pub fn get_file() -> File {
+    let file = OpenOptions::new()
         .write(true)
         .append(true)
+        .create(true)
         .open(OUTPUT_FILE_PATH)
-    {
-        Ok(f) => f,
-        Err(_) => {
-            eprintln!("{} ./{}", ERROR_OUTPUT_FILE_NOT_WRITEABLE, OUTPUT_FILE_PATH);
-            std::process::exit(EXIT_OUTPUT_FILE_NOT_WRITEABLE)
-        }
-    };
+        .unwrap();
 
-    if let Err(e) = writeln!(file, "{}: {}", crypto_key, entropy) {
-        eprintln!("{} {}", ERROR_COULDNT_WRITE_OUTPUT_TO_FILE, e);
-    }
+    file
 }
 
-pub fn recreate_output_file(is_output_file: bool) {
+fn write_to_file(crypto_key: &str, entropy: f32, file: Arc<Mutex<File>>) {  
+    let mut file_guard = file.lock().unwrap();
+    let data = format!("{}: {}\n", crypto_key, entropy);
+    file_guard.write_all(data.as_bytes()).unwrap();
+}
+
+pub fn remove_output_file(is_output_file: bool) {
     if is_output_file {
         if Path::new(OUTPUT_FILE_PATH).exists() {
-            remove_output_file();
+            match fs::remove_file(OUTPUT_FILE_PATH) {
+                Ok(f) => f,
+                Err(_) => {
+                    eprintln!("{}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED);
+                    std::process::exit(EXIT_EXISTING_OUTPUT_FILE_CANNOT_BE_REMOVED);
+                }
+            };
         }
-        create_output_file();
     }
+    
 }
 
-fn remove_output_file() {
-    match fs::remove_file(OUTPUT_FILE_PATH) {
-        Ok(f) => f,
-        Err(_) => {
-            eprintln!("{}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED);
-            std::process::exit(EXIT_EXISTING_OUTPUT_FILE_CANNOT_BE_REMOVED);
-        }
-    };
-}
-
-fn create_output_file() {
-    match File::create(OUTPUT_FILE_PATH) {
-        Ok(f) => f,
-        Err(_) => {
-            eprintln!(
-                "{} ./{}",
-                ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE, OUTPUT_FILE_PATH
-            );
-            std::process::exit(EXIT_OUTPUT_FILE_NOT_WRITEABLE)
-        }
-    };
-}

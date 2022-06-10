@@ -1,4 +1,6 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
+use hex;
+use std::fs::File;
 
 use crate::calculation;
 use crate::input;
@@ -6,6 +8,7 @@ use crate::output;
 
 use crate::cli::arguments::Args;
 use crate::output::write_ck::WriteOptions;
+use crate::output::write_ck::get_file;
 use crate::time::timer::Timer;
 use crate::util::global_constants::SMALLEST_KEY_LENGTH_BIT;
 
@@ -40,21 +43,25 @@ pub fn run() {
             thread_count,
         );
 
+        // recreate output.sckrd if necessary
+        output::write_ck::remove_output_file(args.output_file);
+
         // create write options
+        let file = get_file();
+
         let write_options: WriteOptions =
             WriteOptions::new(args.output_file, args.basic_output, args.verbose);
 
         // create smartpointer variables for threading
         let split_vector_arc = Arc::new(split_vec);
         let write_options_arc = Arc::new(write_options);
-
-        // recreate output.sckrd if necessary
-        output::write_ck::recreate_output_file(args.output_file);
+        let file_arc = Arc::new(Mutex::new(file));
 
         // analyse bytes dump
         analyse_bytes_dump(
             split_vector_arc,
             write_options_arc,
+            file_arc,
             thread_count,
             key_length_byte,
         );
@@ -66,6 +73,7 @@ pub fn run() {
 fn analyse_bytes_dump(
     split_vector_arc: Arc<Vec<Vec<u8>>>,
     write_options_arc: Arc<WriteOptions>,
+    file_arc: Arc<Mutex<File>>,
     thread_count: usize,
     key_length_byte: usize,
 ) {
@@ -75,12 +83,14 @@ fn analyse_bytes_dump(
         for current_thread in 0..thread_count {
             let split_vector_arc = Arc::clone(&split_vector_arc);
             let write_options_arc = Arc::clone(&write_options_arc);
+            let file_arc = Arc::clone(&file_arc);
             thread_handles.push(std::thread::spawn(move || {
                 run_entropy_analysis(
                     split_vector_arc,
+                    write_options_arc,
+                    file_arc,
                     key_length_byte,
                     current_thread,
-                    &write_options_arc,
                 );
             }));
         }
@@ -89,15 +99,16 @@ fn analyse_bytes_dump(
             handle.join().unwrap();
         }
     } else {
-        run_entropy_analysis(split_vector_arc, key_length_byte, 0, &write_options_arc);
+        run_entropy_analysis(split_vector_arc, write_options_arc, file_arc, key_length_byte, 0);
     }
 }
 
 fn run_entropy_analysis(
     bytes_arc: Arc<Vec<Vec<u8>>>,
+    write_options_arc: Arc<WriteOptions>,
+    file_arc: Arc<Mutex<File>>,
     key_length_byte: usize,
     current_thread: usize,
-    write_options: &WriteOptions,
 ) {
     let bytes_length = bytes_arc[current_thread].len();
     for j in 0..(bytes_length - key_length_byte) {
@@ -106,9 +117,9 @@ fn run_entropy_analysis(
         if calculation::exclution::contains_no_non_hash_characters(&scope_vec) {
             let entropy: f32 = calculation::entropy::calc_entropy_per_candidate_key(&scope_vec);
             if calculation::entropy::has_high_entropy(entropy) {
-                if let Ok(crypto_key) = std::str::from_utf8(&scope_vec) {
-                    output::write_ck::write(crypto_key, entropy, key_length_byte, write_options);
-                }
+                let crypto_key = hex::encode(scope_vec);
+                let file_arc = Arc::clone(&file_arc);
+                output::write_ck::write(crypto_key.as_str(), entropy, key_length_byte, &write_options_arc, file_arc);
             }
         }
     }
