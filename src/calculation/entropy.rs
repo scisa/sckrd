@@ -18,6 +18,21 @@ pub fn has_high_entropy(entropy: f32, entropy_boundary: f32) -> bool {
 
 
 #[test]
+fn calc_entropy_boundary_256() {
+    assert_eq!(calc_entropy_boundary(256), 5.0 - ENTROPY_OFFSET);
+}
+
+#[test]
+fn calc_entropy_boundary_128() {
+    assert_eq!(calc_entropy_boundary(128), 4.0 - ENTROPY_OFFSET);
+}
+
+#[test]
+fn calc_entropy_boundary_512() {
+    assert_eq!(calc_entropy_boundary(512), 6.0 - ENTROPY_OFFSET);
+}
+
+#[test]
 fn is_high_entropy_yes_00() {
     assert_eq!(has_high_entropy(5.0, 5.0), true);
 }

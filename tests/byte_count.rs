@@ -14,7 +14,7 @@ fn byte_count_100() -> TestResult {
     let output = "";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "100"])
+        .args(&["-i", TEST_SMALL, "-b", "100", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output));
 
@@ -23,10 +23,10 @@ fn byte_count_100() -> TestResult {
 
 #[test]
 fn byte_count_200() -> TestResult {
-    let output = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
+    let output = "4a36662f4867425a7533496264627457: 3.875";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "200"])
+        .args(&["-i", TEST_SMALL, "-b", "200", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output));
 
@@ -35,11 +35,11 @@ fn byte_count_200() -> TestResult {
 
 #[test]
 fn byte_count_500() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "4a36662f4867425a7533496264627457: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));

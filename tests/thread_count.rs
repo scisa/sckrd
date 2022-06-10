@@ -11,11 +11,11 @@ const TEST_SMALL: &str = "tests/inputs/test_small.bin";
 
 #[test]
 fn thread_count_default() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));
@@ -25,11 +25,11 @@ fn thread_count_default() -> TestResult {
 
 #[test]
 fn thread_count_1() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "1"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "1", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));
@@ -39,11 +39,11 @@ fn thread_count_1() -> TestResult {
 
 #[test]
 fn thread_count_2() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "2"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "2", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));
@@ -53,11 +53,11 @@ fn thread_count_2() -> TestResult {
 
 #[test]
 fn thread_count_8() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "8"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "8", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));
@@ -67,11 +67,11 @@ fn thread_count_8() -> TestResult {
 
 #[test]
 fn thread_count_16() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "16"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "16", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));
@@ -81,11 +81,11 @@ fn thread_count_16() -> TestResult {
 
 #[test]
 fn thread_count_32() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "32"])
+        .args(&["-i", TEST_SMALL, "-b", "500", "-n", "32", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output_00))
         .stdout(predicate::str::contains(output_01));
@@ -95,12 +95,12 @@ fn thread_count_32() -> TestResult {
 
 #[test]
 fn thread_count_range() -> TestResult {
-    let output_00 = "lHGJ6f/HgBZu3IbdbtWYhE6cm77TeUWx: 4.6875";
-    let output_01 = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp: 4.75";
+    let output_00 = "5a753349626462745759684536636d37: 3.875";
+    let output_01 = "344e456141462f4a76563970576a646f: 4";
 
     for i in 0..32 {
         Command::cargo_bin(PROG)?
-            .args(&["-i", TEST_SMALL, "-b", "500", "-n", &(i.to_string())])
+            .args(&["-i", TEST_SMALL, "-b", "500", "-n", &(i.to_string()), "-k", "128"])
             .assert()
             .stdout(predicate::str::contains(output_00))
             .stdout(predicate::str::contains(output_01));

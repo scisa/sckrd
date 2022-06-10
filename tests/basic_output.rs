@@ -11,10 +11,10 @@ const TEST_SMALL: &str = "tests/inputs/test_small.bin";
 
 #[test]
 fn show_basic_output() -> TestResult {
-    let output = "ICDWqRMMUdfH4NEaAF/JvV9pWjdoOzKp";
+    let output = "4943445771524d4d55646648344e4561";
 
     Command::cargo_bin(PROG)?
-        .args(&["-i", TEST_SMALL, "-p"])
+        .args(&["-i", TEST_SMALL, "-p", "-k", "128"])
         .assert()
         .stdout(predicate::str::contains(output));
 
