@@ -8,7 +8,6 @@ use crate::output;
 
 use crate::cli::arguments::Args;
 use crate::output::write_ck::WriteOptions;
-use crate::output::write_ck::get_file;
 use crate::time::timer::Timer;
 use crate::util::global_constants::SMALLEST_KEY_LENGTH_BIT;
 
@@ -26,6 +25,9 @@ pub fn run() {
     // create helper variables
     let key_length_byte: usize = args.keysize / 8;
     let bytes_length = bytes.len();
+
+    // calc entropy boundary
+    let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize);
 
     // check if analysation has to be done
     if bytes_length >= key_length_byte && args.keysize >= SMALLEST_KEY_LENGTH_BIT {
@@ -47,7 +49,7 @@ pub fn run() {
         output::write_ck::remove_output_file(args.output_file);
 
         // create write options
-        let file = get_file();
+        let file = output::write_ck::get_file();
 
         let write_options: WriteOptions =
             WriteOptions::new(args.output_file, args.basic_output, args.verbose);
@@ -64,6 +66,7 @@ pub fn run() {
             file_arc,
             thread_count,
             key_length_byte,
+            entropy_boundary
         );
     }
 
@@ -76,6 +79,7 @@ fn analyse_bytes_dump(
     file_arc: Arc<Mutex<File>>,
     thread_count: usize,
     key_length_byte: usize,
+    entropy_boundary: f32,
 ) {
     let split_vec_len: usize = split_vector_arc.len();
     if split_vec_len == thread_count && thread_count > 1 {
@@ -91,6 +95,7 @@ fn analyse_bytes_dump(
                     file_arc,
                     key_length_byte,
                     current_thread,
+                    entropy_boundary
                 );
             }));
         }
@@ -99,7 +104,7 @@ fn analyse_bytes_dump(
             handle.join().unwrap();
         }
     } else {
-        run_entropy_analysis(split_vector_arc, write_options_arc, file_arc, key_length_byte, 0);
+        run_entropy_analysis(split_vector_arc, write_options_arc, file_arc, key_length_byte, 0, entropy_boundary);
     }
 }
 
@@ -109,6 +114,7 @@ fn run_entropy_analysis(
     file_arc: Arc<Mutex<File>>,
     key_length_byte: usize,
     current_thread: usize,
+    entropy_boundary: f32,
 ) {
     let bytes_length = bytes_arc[current_thread].len();
     for j in 0..(bytes_length - key_length_byte) {
@@ -116,7 +122,7 @@ fn run_entropy_analysis(
         scope_vec.copy_from_slice(&bytes_arc[current_thread][j..(j + key_length_byte)]);
         if calculation::exclution::contains_no_non_hash_characters(&scope_vec) {
             let entropy: f32 = calculation::entropy::calc_entropy_per_candidate_key(&scope_vec);
-            if calculation::entropy::has_high_entropy(entropy) {
+            if calculation::entropy::has_high_entropy(entropy, entropy_boundary) {
                 let crypto_key = hex::encode(scope_vec);
                 let file_arc = Arc::clone(&file_arc);
                 output::write_ck::write(crypto_key.as_str(), entropy, key_length_byte, &write_options_arc, file_arc);

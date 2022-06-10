@@ -1,29 +1,35 @@
-use crate::util::global_constants::ENTROPY_BOUNDARY;
+use crate::util::global_constants::ENTROPY_OFFSET;
+
+pub fn calc_entropy_boundary(key_length_bit: usize) -> f32{
+    let key_bytes: f32 = key_length_bit as f32 / 8.0 as f32;
+    key_bytes.log2() - ENTROPY_OFFSET
+}
 
 pub fn calc_entropy_per_candidate_key(scope_vec: &Vec<u8>) -> f32 {
     entropy::shannon_entropy(&scope_vec)
 }
 
-pub fn has_high_entropy(entropy: f32) -> bool {
-    if entropy >= ENTROPY_BOUNDARY {
+pub fn has_high_entropy(entropy: f32, entropy_boundary: f32) -> bool {
+    if entropy >= entropy_boundary {
         return true;
     }
     return false;
 }
 
+
 #[test]
 fn is_high_entropy_yes_00() {
-    assert_eq!(has_high_entropy(ENTROPY_BOUNDARY), true);
+    assert_eq!(has_high_entropy(5.0, 5.0), true);
 }
 
 #[test]
 fn is_high_entropy_yes_01() {
-    assert_eq!(has_high_entropy(ENTROPY_BOUNDARY + 1.0), true);
+    assert_eq!(has_high_entropy(5.0, 4.75), true);
 }
 
 #[test]
 fn is_high_entropy_no() {
-    assert_eq!(has_high_entropy(ENTROPY_BOUNDARY - 1.0), false);
+    assert_eq!(has_high_entropy(4.5, 4.75), false);
 }
 
 #[test]
