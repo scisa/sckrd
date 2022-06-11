@@ -9,12 +9,6 @@ pub fn contains_no_non_hash_characters(scope_vec: &Vec<u8>) -> bool {
     return true;
 }
 
-#[test]
-fn contains_non_hashable_character_newline() {
-    let scope_vec: Vec<u8> = vec![15, 30, 47, 11, 10, 90, 111, 120, 35, 210];
-
-    assert_eq!(contains_no_non_hash_characters(&scope_vec), false);
-}
 
 #[test]
 fn contains_non_hashable_character_space() {

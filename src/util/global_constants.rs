@@ -5,14 +5,14 @@ pub const APP_AUTHOR: &str = "scisa <scisa@web.de>";
 pub const APP_DESCRIPTION: &str = "search crypto keys in ram dumps";
 
 // calculation
-pub const ENTROPY_OFFSET: f32 = 0.2;
+pub const ENTROPY_DELTA: f32 = 0.2;
 pub const SMALLEST_KEY_LENGTH_BIT: usize = 64;
 
 //output
 pub const OUTPUT_FILE_PATH: &str = "./sckrd.keys";
 
 // chars never in hashes
-pub const BYTE_NEWLINE: u8 = 10; //\n
+// pub const BYTE_NEWLINE: u8 = 10; //\n
 pub const BYTE_SPACE: u8 = 32; //
 pub const BYTE_EXCLAMATION_MARK: u8 = 33; //\!
 pub const BYTE_DOLLAR: u8 = 36; //$
@@ -21,8 +21,7 @@ pub const BYTE_COLON: u8 = 58; //:
 pub const BYTE_SEMICOLON: u8 = 59; //;
 pub const BYTE_BACKSLASH: u8 = 92; //\\
 
-pub const EXCLUDES: [u8; 8] = [
-    BYTE_NEWLINE,
+pub const EXCLUDES: [u8; 7] = [
     BYTE_SPACE,
     BYTE_EXCLAMATION_MARK,
     BYTE_DOLLAR,

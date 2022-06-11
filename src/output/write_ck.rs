@@ -51,12 +51,17 @@ fn write_to_stdout(
 }
 
 pub fn get_file() -> File {
-    let file = OpenOptions::new()
+    let file = match OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
-        .open(OUTPUT_FILE_PATH)
-        .unwrap();
+        .open(OUTPUT_FILE_PATH) {
+            Ok(file) => file,
+            Err(e) => {
+                eprintln!("{}: {}", ERROR_OUTPUT_FILE_CAN_NOT_BE_CREATED, e);
+                std::process::exit(EXIT_OUTPUT_FILE_CAN_NOT_BE_CREATED);
+            }
+        };
 
     file
 }
@@ -64,7 +69,9 @@ pub fn get_file() -> File {
 fn write_to_file(crypto_key: &str, entropy: f32, file: Arc<Mutex<File>>) {  
     let mut file_guard = file.lock().unwrap();
     let data = format!("{}: {}\n", crypto_key, entropy);
-    file_guard.write_all(data.as_bytes()).unwrap();
+    if let Err(e) = file_guard.write_all(data.as_bytes()) {
+        eprintln!("{}: {}", ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE, e);
+    }
 }
 
 pub fn remove_output_file(is_output_file: bool) {
@@ -72,8 +79,8 @@ pub fn remove_output_file(is_output_file: bool) {
         if Path::new(OUTPUT_FILE_PATH).exists() {
             match fs::remove_file(OUTPUT_FILE_PATH) {
                 Ok(f) => f,
-                Err(_) => {
-                    eprintln!("{}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED);
+                Err(e) => {
+                    eprintln!("{}: {}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED, e);
                     std::process::exit(EXIT_EXISTING_OUTPUT_FILE_CANNOT_BE_REMOVED);
                 }
             };
