@@ -16,6 +16,7 @@ pub struct Args {
     pub basic_output: bool,
     pub verbose: bool,
     pub byte_count: usize,
+    pub entropy_delta: f32,
 }
 
 impl Args {
@@ -38,6 +39,7 @@ impl Args {
             basic_output: Self::extract_basic_output(&args),
             verbose: Self::extract_verbose(&args),
             byte_count: Self::extract_byte_count(&args),
+            entropy_delta: Self::extract_entropy_delta(&args),
         }
     }
 
@@ -122,6 +124,16 @@ impl Args {
                     .long(LONG_ARG_BYTE_COUNT)
                     .default_value(DEFAULT_VALUE_BYTE_COUNT),
             )
+            .arg(
+                Arg::new(KEY_ENTROPY_DELTA)
+                    .help(HELP_ENTROPY_DELTA)
+                    .value_name(VALUE_ENTROPY_DELTA)
+                    .required(false)
+                    .short('e')
+                    .takes_value(true)
+                    .long(LONG_ARG_ENTROPY_DELTA)
+                    .default_value(DEFAULT_VALUE_ENTROPY_DELTA),
+            )
             .get_matches();
         Ok(matches)
     }
@@ -175,6 +187,17 @@ impl Args {
             Err(_) => {
                 eprintln!("{}", ERROR_BYTE_COUNT_NOT_U32);
                 std::process::exit(EXIT_BYTE_COUNT_ARG_IS_UNSIGNED_INT)
+            }
+        }
+    }
+
+    fn extract_entropy_delta(args: &ArgMatches) -> f32 {
+        let string_entropy_delta = args.value_of(KEY_ENTROPY_DELTA).unwrap().to_string();
+        match string_entropy_delta.parse::<f32>() {
+            Ok(e) => e,
+            Err(_) => {
+                eprintln!("{}", ERROR_ENTROPY_DELTA_NOT_F32);
+                std::process::exit(EXIT_ENTROPY_DELTA_ARG_IS_F32)
             }
         }
     }

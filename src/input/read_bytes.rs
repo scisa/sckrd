@@ -18,7 +18,7 @@ pub fn get_bytes(path: &str, byte_count: usize) -> Vec<u8> {
             Ok(b) => b,
             Err(e) => {
                 eprintln!("{}: {}", ERROR_READ_BYTES_TO_VECTOR_FAILED, e);
-                std::process::exit(EXIT_READ_BYTES_TO_VECTOR_FAILED)
+                std::process::exit(EXIT_READ_BYTES_TO_VECTOR_FAILED);
             },
         };
     }

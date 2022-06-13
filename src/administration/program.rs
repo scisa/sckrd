@@ -27,7 +27,8 @@ pub fn run() {
     let bytes_length = bytes.len();
 
     // calc entropy boundary
-    let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize);
+    let entropy_delta = calculation::entropy::calc_entropy_delta(args.entropy_delta);
+    let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize, entropy_delta);
 
     // check if analysation has to be done
     if bytes_length >= key_length_byte && args.keysize >= SMALLEST_KEY_LENGTH_BIT {
