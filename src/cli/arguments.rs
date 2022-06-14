@@ -139,15 +139,15 @@ impl Args {
     }
 
     fn extract_input_file(args: &ArgMatches) -> String {
-        args.value_of(KEY_INPUT_FILE).unwrap().to_string()
+        args.get_one::<String>(KEY_INPUT_FILE).unwrap().to_string()
     }
 
     fn extract_output_file(args: &ArgMatches) -> bool {
-        args.is_present(KEY_OUTPUT_FILE)
+        args.contains_id(KEY_OUTPUT_FILE)
     }
 
     fn extract_keysize(args: &ArgMatches) -> usize {
-        let string_key = args.value_of(KEY_KEYSIZE).unwrap().to_string();
+        let string_key = args.get_one::<String>(KEY_KEYSIZE).unwrap().to_string();
         match string_key.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
@@ -158,11 +158,11 @@ impl Args {
     }
 
     fn extract_timer(args: &ArgMatches) -> bool {
-        args.is_present(KEY_TIMER)
+        args.contains_id(KEY_TIMER)
     }
 
     fn extract_thread_count(args: &ArgMatches) -> usize {
-        let string_key = args.value_of(KEY_THREAD_COUNT).unwrap().to_string();
+        let string_key = args.get_one::<String>(KEY_THREAD_COUNT).unwrap().to_string();
         match string_key.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
@@ -173,15 +173,15 @@ impl Args {
     }
 
     fn extract_basic_output(args: &ArgMatches) -> bool {
-        args.is_present(KEY_BASIC_OUTPUT)
+        args.contains_id(KEY_BASIC_OUTPUT)
     }
 
     fn extract_verbose(args: &ArgMatches) -> bool {
-        args.is_present(KEY_VERBOSE)
+        args.contains_id(KEY_VERBOSE)
     }
 
     fn extract_byte_count(args: &ArgMatches) -> usize {
-        let string_byte_count = args.value_of(KEY_BYTE_COUNT).unwrap().to_string();
+        let string_byte_count = args.get_one::<String>(KEY_BYTE_COUNT).unwrap().to_string();
         match string_byte_count.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
@@ -192,7 +192,7 @@ impl Args {
     }
 
     fn extract_entropy_delta(args: &ArgMatches) -> f32 {
-        let string_entropy_delta = args.value_of(KEY_ENTROPY_DELTA).unwrap().to_string();
+        let string_entropy_delta = args.get_one::<String>(KEY_ENTROPY_DELTA).unwrap().to_string();
         match string_entropy_delta.parse::<f32>() {
             Ok(e) => e,
             Err(_) => {
