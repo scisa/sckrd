@@ -13,20 +13,20 @@ pub const OUTPUT_FILE_PATH: &str = "./sckrd.keys";
 
 // chars never in hashes
 // pub const BYTE_NEWLINE: u8 = 10; //\n
-pub const BYTE_SPACE: u8 = 32; //
-pub const BYTE_EXCLAMATION_MARK: u8 = 33; //\!
-pub const BYTE_DOLLAR: u8 = 36; //$
-pub const BYTE_ASTERISK: u8 = 42; //*
-pub const BYTE_COLON: u8 = 58; //:
-pub const BYTE_SEMICOLON: u8 = 59; //;
-pub const BYTE_BACKSLASH: u8 = 92; //\\
+// pub const BYTE_SPACE: u8 = 32; //
+// pub const BYTE_EXCLAMATION_MARK: u8 = 33; //\!
+// pub const BYTE_DOLLAR: u8 = 36; //$
+// pub const BYTE_ASTERISK: u8 = 42; //*
+// pub const BYTE_COLON: u8 = 58; //:
+// pub const BYTE_SEMICOLON: u8 = 59; //;
+// pub const BYTE_BACKSLASH: u8 = 92; //\\
 
-pub const EXCLUDES: [u8; 7] = [
-    BYTE_SPACE,
-    BYTE_EXCLAMATION_MARK,
-    BYTE_DOLLAR,
-    BYTE_ASTERISK,
-    BYTE_COLON,
-    BYTE_SEMICOLON,
-    BYTE_BACKSLASH,
-];
+// pub const EXCLUDES: [u8; 7] = [
+//     BYTE_SPACE,
+//     BYTE_EXCLAMATION_MARK,
+//     BYTE_DOLLAR,
+//     BYTE_ASTERISK,
+//     BYTE_COLON,
+//     BYTE_SEMICOLON,
+//     BYTE_BACKSLASH,
+// ];

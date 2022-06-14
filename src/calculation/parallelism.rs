@@ -3,17 +3,15 @@ pub fn split_bytes_vector_for_threading(
     key_length_byte: usize,
     n: usize,
 ) -> Vec<Vec<u8>> {
-    let bytes_len: usize = bytes.len();
     let bytes_len_init: usize = bytes.len();
     let mut split_vec: Vec<Vec<u8>> = Vec::new();
 
-    if bytes_len > key_length_byte * 8 && n > 1 {
+    if bytes_len_init > key_length_byte * 8 && n > 1 {
         split_up_bytes(
             bytes,
             &mut split_vec,
             key_length_byte,
             n,
-            bytes_len,
             bytes_len_init,
         );
     } else {
@@ -28,12 +26,12 @@ fn split_up_bytes(
     split_vec: &mut Vec<Vec<u8>>,
     key_length_byte: usize,
     n: usize,
-    bytes_len: usize,
     bytes_len_init: usize,
 ) {
+    let mut bytes_len: usize = bytes.len();
     let mut overlap_vector: Vec<u8> = Vec::new();
     for i in 0..n {
-        if bytes_len >= n {
+        if bytes_len >= (bytes_len_init / n) + key_length_byte {
             create_full_split_vector(
                 bytes,
                 split_vec,
@@ -43,6 +41,7 @@ fn split_up_bytes(
                 i,
                 n,
             );
+            bytes_len = bytes.len();
         } else {
             create_rest_split_vector(bytes, split_vec, &mut overlap_vector, key_length_byte, i);
             break;
