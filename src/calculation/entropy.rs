@@ -1,6 +1,13 @@
-pub fn calc_entropy_boundary(key_length_bit: usize, entropy_delta: f32) -> f32{
+use crate::util::global_constants::DEFAULT_ENTROPY_DELTA;
+
+pub fn calc_entropy_boundary(key_length_bit: usize, entropy_delta: f32) -> f32 {
     let key_bytes: f32 = key_length_bit as f32 / 8.0 as f32;
-    key_bytes.log2() - entropy_delta
+    let boundary = key_bytes.log2() - entropy_delta;
+
+    if boundary < 0.0 {
+        return 0.0;
+    }
+    return boundary;
 }
 
 pub fn calc_entropy_per_candidate_key(scope_vec: &Vec<u8>) -> f32 {
@@ -15,6 +22,9 @@ pub fn has_high_entropy(entropy: f32, entropy_boundary: f32) -> bool {
 }
 
 pub fn calc_entropy_delta(user_given_entropy_delta: f32) -> f32 {
+    if user_given_entropy_delta < 0.0 {
+        return DEFAULT_ENTROPY_DELTA;
+    }
     return user_given_entropy_delta;
 }
 
