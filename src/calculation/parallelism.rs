@@ -6,7 +6,7 @@ pub fn split_bytes_vector_for_threading(
     let bytes_len_init: usize = bytes.len();
     let mut split_vec: Vec<Vec<u8>> = Vec::new();
 
-    if bytes_len_init > key_length_byte * 8 && n > 1 {
+    if bytes_len_init > key_length_byte * n && n > 1 {
         split_up_bytes(
             bytes,
             &mut split_vec,
