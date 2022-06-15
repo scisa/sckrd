@@ -46,4 +46,4 @@ pub const KEY_ENTROPY_DELTA: &str = "entropy_delta";
 pub const HELP_ENTROPY_DELTA: &str = "entropy delta of how many results will be recognized";
 pub const VALUE_ENTROPY_DELTA: &str = "ENTROPY_DELTA";
 pub const LONG_ARG_ENTROPY_DELTA: &str = "entropy-delta";
-pub const DEFAULT_VALUE_ENTROPY_DELTA: &str = "0.0";
+pub const DEFAULT_VALUE_ENTROPY_DELTA: &str = "0.4";
