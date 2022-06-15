@@ -9,7 +9,6 @@ use crate::output;
 use crate::cli::arguments::Args;
 use crate::output::write_ck::WriteOptions;
 use crate::time::timer::Timer;
-use crate::util::global_constants::SMALLEST_KEY_LENGTH_BIT;
 
 pub fn run() {
     // fetch args
@@ -23,7 +22,7 @@ pub fn run() {
         input::read_bytes::get_bytes(args.input_file.as_str(), args.byte_count);
 
     // create helper variables
-    let key_length_byte: usize = args.keysize / 8;
+    let key_length_byte: usize = calculation::entropy::calc_key_length_byte(args.keysize);
     let bytes_length = bytes.len();
 
     // calc entropy boundary
@@ -31,7 +30,7 @@ pub fn run() {
     let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize, entropy_delta);
 
     // check if analysation has to be done
-    if bytes_length >= key_length_byte && args.keysize >= SMALLEST_KEY_LENGTH_BIT {
+    if bytes_length >= key_length_byte {
         // calculate number of parallel tasks
         let thread_count = calculation::parallelism::calc_thread_count(
             bytes_length,
