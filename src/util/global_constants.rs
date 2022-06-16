@@ -7,6 +7,7 @@ pub const APP_DESCRIPTION: &str = "search crypto keys in ram dumps";
 // calculation
 pub const DEFAULT_ENTROPY_DELTA: f32 = 0.4;
 pub const SMALLEST_KEY_LENGTH_BIT: usize = 56;
+pub const GREATEST_KEY_LENGTH_BIT: usize = 1024;
 
 //output
 pub const OUTPUT_FILE_PATH: &str = "./sckrd.keys";
