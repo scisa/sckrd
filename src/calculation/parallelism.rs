@@ -84,8 +84,8 @@ fn create_overlap(
     key_length_byte: usize,
     current_thread: usize,
 ) -> Vec<u8> {
-    let mut overlap_vector: Vec<u8> = vec![0; key_length_byte - 1];
-    overlap_vector.copy_from_slice(&split_vec[current_thread - 1][0..key_length_byte - 1]);
+    let mut overlap_vector: Vec<u8> = vec![0; key_length_byte];
+    overlap_vector.copy_from_slice(&split_vec[current_thread - 1][0..key_length_byte]);
 
     overlap_vector
 }
