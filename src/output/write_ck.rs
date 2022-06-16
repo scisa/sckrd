@@ -11,20 +11,25 @@ pub struct WriteOptions {
     pub is_output_file: bool,
     pub is_basic_output: bool,
     pub is_verbose: bool,
+    pub is_suppress_output: bool,
 }
 
 impl WriteOptions {
-    pub fn new(is_output_file: bool, is_basic_output: bool, is_verbose: bool) -> Self {
+    pub fn new(is_output_file: bool, is_basic_output: bool, is_verbose: bool, is_suppress_output: bool) -> Self {
         Self {
             is_output_file: is_output_file,
             is_basic_output: is_basic_output,
             is_verbose: is_verbose,
+            is_suppress_output: is_suppress_output,
         }
     }
 }
 
 pub fn write(crypto_key: &str, entropy: f32, key_length_byte: usize, write_options: &WriteOptions, file: Arc<Mutex<File>>) {
-    write_to_stdout(crypto_key, entropy, key_length_byte, &write_options);
+    if !write_options.is_suppress_output {
+        write_to_stdout(crypto_key, entropy, key_length_byte, &write_options);
+    }
+    
     if write_options.is_output_file {
         write_to_file(crypto_key, entropy, file)
     }

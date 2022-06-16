@@ -12,9 +12,11 @@ pub struct Args {
     pub output_file: bool,
     pub keysize: usize,
     pub timer: bool,
+    pub result_counter: bool,
     pub thread_count: usize,
     pub basic_output: bool,
     pub verbose: bool,
+    pub suppress_output: bool,
     pub byte_count: usize,
     pub entropy_delta: f32,
 }
@@ -35,9 +37,11 @@ impl Args {
             output_file: Self::extract_output_file(&args),
             keysize: Self::extract_keysize(&args),
             timer: Self::extract_timer(&args),
+            result_counter: Self::extract_result_counter(&args),
             thread_count: Self::extract_thread_count(&args),
             basic_output: Self::extract_basic_output(&args),
             verbose: Self::extract_verbose(&args),
+            suppress_output: Self::extract_suppress_output(&args),
             byte_count: Self::extract_byte_count(&args),
             entropy_delta: Self::extract_entropy_delta(&args),
         }
@@ -86,6 +90,15 @@ impl Args {
                     .long(LONG_ARG_TIMER),
             )
             .arg(
+                Arg::new(KEY_RESULT_COUNTER)
+                    .help(HELP_RESULT_COUNTER)
+                    .value_name(VALUE_RESULT_COUNTER)
+                    .required(false)
+                    .short('c')
+                    .takes_value(false)
+                    .long(LONG_ARG_RESULT_COUNTER),
+            )
+            .arg(
                 Arg::new(KEY_THREAD_COUNT)
                     .help(HELP_THREAD_COUNT)
                     .value_name(VALUE_THREAD_COUNT)
@@ -102,7 +115,9 @@ impl Args {
                     .required(false)
                     .short('p')
                     .takes_value(false)
-                    .long(LONG_ARG_BASIC_OUTPUT),
+                    .long(LONG_ARG_BASIC_OUTPUT)
+                    .conflicts_with(KEY_VERBOSE)
+                    .conflicts_with(KEY_SUPPRESS_OUTPUT),
             )
             .arg(
                 Arg::new(KEY_VERBOSE)
@@ -112,7 +127,19 @@ impl Args {
                     .short('v')
                     .takes_value(false)
                     .long(LONG_ARG_VERBOSE)
-                    .conflicts_with(KEY_BASIC_OUTPUT),
+                    .conflicts_with(KEY_BASIC_OUTPUT)
+                    .conflicts_with(KEY_SUPPRESS_OUTPUT),
+            )
+            .arg(
+                Arg::new(KEY_SUPPRESS_OUTPUT)
+                    .help(HELP_SUPPRESS_OUTPUT)
+                    .value_name(VALUE_SUPPRESS_OUTPUT)
+                    .required(false)
+                    .short('s')
+                    .takes_value(false)
+                    .long(LONG_ARG_SUPPRESS_OUTPUT)
+                    .conflicts_with(KEY_BASIC_OUTPUT)
+                    .conflicts_with(KEY_VERBOSE),
             )
             .arg(
                 Arg::new(KEY_BYTE_COUNT)
@@ -161,6 +188,10 @@ impl Args {
         args.contains_id(KEY_TIMER)
     }
 
+    fn extract_result_counter(args: &ArgMatches) -> bool {
+        args.contains_id(KEY_RESULT_COUNTER)
+    }
+
     fn extract_thread_count(args: &ArgMatches) -> usize {
         let string_key = args.get_one::<String>(KEY_THREAD_COUNT).unwrap().to_string();
         match string_key.parse::<usize>() {
@@ -178,6 +209,10 @@ impl Args {
 
     fn extract_verbose(args: &ArgMatches) -> bool {
         args.contains_id(KEY_VERBOSE)
+    }
+
+    fn extract_suppress_output(args: &ArgMatches) -> bool {
+        args.contains_id(KEY_SUPPRESS_OUTPUT)
     }
 
     fn extract_byte_count(args: &ArgMatches) -> usize {

@@ -9,6 +9,7 @@ use crate::output;
 use crate::cli::arguments::Args;
 use crate::output::write_ck::WriteOptions;
 use crate::time::timer::Timer;
+use crate::calculation::counter::Counter;
 
 pub fn run() {
     // fetch args
@@ -16,6 +17,9 @@ pub fn run() {
 
     // initialize timer
     let timer = Timer::new();
+
+    // create result counter
+    let result_counter: Counter = Counter::new();
 
     // fetch bytes
     let mut bytes: Vec<u8> =
@@ -28,6 +32,10 @@ pub fn run() {
     // calc entropy boundary
     let entropy_delta = calculation::entropy::calc_entropy_delta(args.entropy_delta);
     let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize, entropy_delta);
+
+    // create smartpointer arc for counter
+    let result_counter_arc = Arc::new(Mutex::new(result_counter));
+    let result_counter_show_arc = Arc::clone(&result_counter_arc);
 
     // check if analysation has to be done
     if bytes_length >= key_length_byte {
@@ -50,10 +58,10 @@ pub fn run() {
 
         // create write options
         let file = output::write_ck::get_file();
-
         let write_options: WriteOptions =
-            WriteOptions::new(args.output_file, args.basic_output, args.verbose);
+            WriteOptions::new(args.output_file, args.basic_output, args.verbose, args.suppress_output);
 
+        
         // create smartpointer variables for threading
         let split_vector_arc = Arc::new(split_vec);
         let write_options_arc = Arc::new(write_options);
@@ -64,12 +72,14 @@ pub fn run() {
             split_vector_arc,
             write_options_arc,
             file_arc,
+            result_counter_arc,
             thread_count,
             key_length_byte,
             entropy_boundary
         );
     }
 
+    show_counter_if_needed(result_counter_show_arc, args.result_counter);
     show_timer_if_needed(&timer, args.timer)
 }
 
@@ -77,6 +87,7 @@ fn analyse_bytes_dump(
     split_vector_arc: Arc<Vec<Vec<u8>>>,
     write_options_arc: Arc<WriteOptions>,
     file_arc: Arc<Mutex<File>>,
+    result_counter_arc: Arc<Mutex<Counter>>,
     thread_count: usize,
     key_length_byte: usize,
     entropy_boundary: f32,
@@ -88,11 +99,13 @@ fn analyse_bytes_dump(
             let split_vector_arc = Arc::clone(&split_vector_arc);
             let write_options_arc = Arc::clone(&write_options_arc);
             let file_arc = Arc::clone(&file_arc);
+            let result_counter_arc = Arc::clone(&result_counter_arc);
             thread_handles.push(std::thread::spawn(move || {
                 run_entropy_analysis(
                     split_vector_arc,
                     write_options_arc,
                     file_arc,
+                    result_counter_arc,
                     key_length_byte,
                     current_thread,
                     entropy_boundary
@@ -104,7 +117,7 @@ fn analyse_bytes_dump(
             handle.join().unwrap();
         }
     } else {
-        run_entropy_analysis(split_vector_arc, write_options_arc, file_arc, key_length_byte, 0, entropy_boundary);
+        run_entropy_analysis(split_vector_arc, write_options_arc, file_arc, result_counter_arc, key_length_byte, 0, entropy_boundary);
     }
 }
 
@@ -112,6 +125,7 @@ fn run_entropy_analysis(
     bytes_arc: Arc<Vec<Vec<u8>>>,
     write_options_arc: Arc<WriteOptions>,
     file_arc: Arc<Mutex<File>>,
+    result_counter_arc: Arc<Mutex<Counter>>,
     key_length_byte: usize,
     current_thread: usize,
     entropy_boundary: f32,
@@ -126,8 +140,18 @@ fn run_entropy_analysis(
                 let crypto_key = hex::encode(scope_vec);
                 let file_arc = Arc::clone(&file_arc);
                 output::write_ck::write(crypto_key.as_str(), entropy, key_length_byte, &write_options_arc, file_arc);
+                let mut counter_lock = result_counter_arc.lock().unwrap();
+                counter_lock.increment()
             }
         }
+    }
+}
+
+fn show_counter_if_needed(result_counter: Arc<Mutex<Counter>>, show_counter: bool) {
+    // show counter
+    if show_counter {
+        let counter_guard = result_counter.lock().unwrap();
+        counter_guard.print_result();
     }
 }
 
