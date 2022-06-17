@@ -1,20 +1,17 @@
-use crate::util::global_constants::MAX_THREADS;
-
 pub fn split_bytes_vector_for_threading(
     bytes: &mut Vec<u8>,
     key_length_byte: usize,
     n: usize,
 ) -> Vec<Vec<u8>> {
-    let bytes_len_init: usize = bytes.len();
+    
     let mut split_vec: Vec<Vec<u8>> = Vec::new();
 
-    if bytes_len_init > key_length_byte * n && n > 1 {
+    if bytes.len() > key_length_byte * n && n > 1 {
         split_up_bytes(
             bytes,
             &mut split_vec,
             key_length_byte,
             n,
-            bytes_len_init,
         );
     } else {
         split_vec.push(bytes.to_vec());
@@ -28,12 +25,11 @@ fn split_up_bytes(
     split_vec: &mut Vec<Vec<u8>>,
     key_length_byte: usize,
     n: usize,
-    bytes_len_init: usize,
 ) {
-    let mut bytes_len: usize = bytes.len();
+    let bytes_len_init: usize = bytes.len();
     let mut overlap_vector: Vec<u8> = Vec::new();
     for i in 0..n {
-        if bytes_len >= (bytes_len_init / n) + key_length_byte {
+        if i < n - 1 {
             create_full_split_vector(
                 bytes,
                 split_vec,
@@ -43,7 +39,6 @@ fn split_up_bytes(
                 i,
                 n,
             );
-            bytes_len = bytes.len();
         } else {
             create_rest_split_vector(bytes, split_vec, &mut overlap_vector, key_length_byte, i);
             break;
@@ -100,12 +95,10 @@ pub fn calc_thread_count(
     if thread_count == 0 {
         thread_count = 1;
     }
-    while (bytes_length / thread_count) < key_length_byte {
+    while (bytes_length / thread_count) < key_length_byte * 2 {
         thread_count /= 2;
     }
-    if thread_count > MAX_THREADS {
-        thread_count = MAX_THREADS;
-    }
+
     thread_count
 }
 
