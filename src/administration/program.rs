@@ -131,7 +131,7 @@ fn run_entropy_analysis(
     entropy_boundary: f32,
 ) {
     let bytes_length = bytes_arc[current_thread].len();
-    for j in 0..(bytes_length - key_length_byte) {
+    for j in 0..(bytes_length - key_length_byte + 1) {
         let mut scope_vec: Vec<u8> = vec![0; key_length_byte];
         scope_vec.copy_from_slice(&bytes_arc[current_thread][j..(j + key_length_byte)]);
         if calculation::exclution::contains_no_non_hash_characters(&scope_vec) {
