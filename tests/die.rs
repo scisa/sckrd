@@ -25,11 +25,37 @@ fn dies_verbose_and_basic_output() -> TestResult {
 }
 
 #[test]
-fn dies_basic_and_verbose_output() -> TestResult {
+fn dies_minimal_and_verbose_output() -> TestResult {
     let msg = "The argument '--basic-output' cannot be used with '--verbose'";
 
     Command::cargo_bin(PROG)?
         .args(&["-p", "-v"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(msg));
+
+    Ok(())
+}
+
+#[test]
+fn dies_suppress_and_verbose_output() -> TestResult {
+    let msg = "The argument '--suppress-output' cannot be used with '--verbose'";
+
+    Command::cargo_bin(PROG)?
+        .args(&["-s", "-v"])
+        .assert()
+        .failure()
+        .stderr(predicate::str::contains(msg));
+
+    Ok(())
+}
+
+#[test]
+fn dies_suppress_and_minimal_output() -> TestResult {
+    let msg = "The argument '--suppress-output' cannot be used with '--basic-output'";
+
+    Command::cargo_bin(PROG)?
+        .args(&["-s", "-p"])
         .assert()
         .failure()
         .stderr(predicate::str::contains(msg));

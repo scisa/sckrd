@@ -94,11 +94,12 @@ pub fn calc_thread_count(
 ) -> usize {
     if thread_count == 0 {
         thread_count = 1;
+    } else {
+        while (bytes_length / thread_count) < key_length_byte * 2 {
+            thread_count /= 2;
+        }
     }
-    while (bytes_length / thread_count) < key_length_byte * 2 {
-        thread_count /= 2;
-    }
-
+    
     thread_count
 }
 
@@ -113,17 +114,17 @@ fn calc_thread_count_0() {
 
 #[test]
 fn calc_thread_count_very_high_but_equal_bytes_length() {
-    assert_eq!(calc_thread_count(500, 500, 32), 15);
+    assert_eq!(calc_thread_count(500, 500, 32), 7);
 }
 
 #[test]
 fn calc_thread_count_very_high_but_lower_bytes_length() {
-    assert_eq!(calc_thread_count(500, 600, 32), 9);
+    assert_eq!(calc_thread_count(500, 600, 32), 4);
 }
 
 #[test]
 fn calc_thread_count_very_high_but_higher_bytes_length() {
-    assert_eq!(calc_thread_count(500, 400, 32), 12);
+    assert_eq!(calc_thread_count(500, 400, 32), 6);
 }
 
 #[test]
@@ -143,20 +144,20 @@ fn calc_thread_count_4() {
 
 #[test]
 fn calc_thread_count_8() {
-    assert_eq!(calc_thread_count(500, 8, 32), 8);
+    assert_eq!(calc_thread_count(500, 8, 32), 4);
 }
 
 #[test]
 fn calc_thread_count_15() {
-    assert_eq!(calc_thread_count(500, 15, 32), 15);
+    assert_eq!(calc_thread_count(500, 15, 32), 7);
 }
 
 #[test]
 fn calc_thread_count_16() {
-    assert_eq!(calc_thread_count(500, 16, 32), 8);
+    assert_eq!(calc_thread_count(500, 16, 32), 4);
 }
 
 #[test]
 fn calc_thread_count_32() {
-    assert_eq!(calc_thread_count(500, 32, 32), 8);
+    assert_eq!(calc_thread_count(500, 32, 32), 4);
 }

@@ -58,17 +58,17 @@ fn calc_entropy_boundary_512() {
 }
 
 #[test]
-fn is_high_entropy_yes_00() {
+fn has_high_entropy_yes_00() {
     assert_eq!(has_high_entropy(5.0, 5.0), true);
 }
 
 #[test]
-fn is_high_entropy_yes_01() {
+fn has_high_entropy_yes_01() {
     assert_eq!(has_high_entropy(5.0, 4.75), true);
 }
 
 #[test]
-fn is_high_entropy_no() {
+fn has_high_entropy_no() {
     assert_eq!(has_high_entropy(4.5, 4.75), false);
 }
 
@@ -78,4 +78,45 @@ fn calc_entropy_for_scope_vector() {
         23, 38, 44, 11, 47, 13, 20, 18, 4, 90, 89, 64, 220, 138, 136, 180, 24, 254, 8, 88,
     ];
     assert_eq!(calc_entropy_per_candidate_key(&scope_vec), 4.321928);
+}
+
+#[test]
+fn calc_key_length_byte_byte_0() {
+    assert_eq!(calc_key_length_byte(0), SMALLEST_KEY_LENGTH_BIT / 8);
+}
+
+#[test]
+fn calc_key_length_byte_byte_55() {
+    assert_eq!(calc_key_length_byte(55), SMALLEST_KEY_LENGTH_BIT / 8);
+}
+
+#[test]
+fn calc_key_length_byte_byte_56() {
+    assert_eq!(calc_key_length_byte(56), 56 / 8);
+}
+
+#[test]
+fn calc_key_length_byte_byte_1024() {
+    assert_eq!(calc_key_length_byte(1024), 1024 / 8);
+}
+
+#[test]
+fn calc_key_length_byte_byte_1025() {
+    assert_eq!(calc_key_length_byte(1025), GREATEST_KEY_LENGTH_BIT / 8);
+}
+
+#[test]
+fn calc_key_length_byte_byte_128() {
+    assert_eq!(calc_key_length_byte(128), 128 / 8);
+}
+
+#[test]
+fn calc_key_length_byte_byte_256() {
+    assert_eq!(calc_key_length_byte(256), 256 / 8);
+}
+
+
+#[test]
+fn calc_key_length_byte_byte_512() {
+    assert_eq!(calc_key_length_byte(512), 512 / 8);
 }
