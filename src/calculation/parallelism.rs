@@ -1,9 +1,10 @@
+use crate::util::global_constants::MINIMAL_THREAD_VALUE;
+
 pub fn split_bytes_vector_for_threading(
     bytes: &mut Vec<u8>,
     key_length_byte: usize,
     n: usize,
 ) -> Vec<Vec<u8>> {
-    
     let mut split_vec: Vec<Vec<u8>> = Vec::new();
 
     if bytes.len() > key_length_byte * n && n > 1 {
@@ -93,7 +94,7 @@ pub fn calc_thread_count(
     key_length_byte: usize,
 ) -> usize {
     if thread_count == 0 {
-        thread_count = 1;
+        thread_count = MINIMAL_THREAD_VALUE;
     } else {
         while (bytes_length / thread_count) < key_length_byte * 2 {
             thread_count /= 2;
