@@ -1,15 +1,15 @@
-use std::sync::{Arc, Mutex};
 use hex;
 use std::fs::File;
+use std::sync::{Arc, Mutex};
 
 use crate::calculation;
 use crate::input;
 use crate::output;
 
+use crate::calculation::counter::Counter;
 use crate::cli::arguments::Args;
 use crate::output::write_ck::WriteOptions;
 use crate::time::timer::Timer;
-use crate::calculation::counter::Counter;
 
 pub fn run() {
     // fetch args
@@ -58,10 +58,13 @@ pub fn run() {
 
         // create write options
         let file = output::write_ck::get_file();
-        let write_options: WriteOptions =
-            WriteOptions::new(args.output_file, args.basic_output, args.verbose, args.suppress_output);
+        let write_options: WriteOptions = WriteOptions::new(
+            args.output_file,
+            args.basic_output,
+            args.verbose,
+            args.suppress_output,
+        );
 
-        
         // create smartpointer variables for threading
         let split_vector_arc = Arc::new(split_vec);
         let write_options_arc = Arc::new(write_options);
@@ -75,7 +78,7 @@ pub fn run() {
             result_counter_arc,
             thread_count,
             key_length_byte,
-            entropy_boundary
+            entropy_boundary,
         );
     }
 
@@ -108,7 +111,7 @@ fn analyse_bytes_dump(
                     result_counter_arc,
                     key_length_byte,
                     current_thread,
-                    entropy_boundary
+                    entropy_boundary,
                 );
             }));
         }
@@ -117,7 +120,15 @@ fn analyse_bytes_dump(
             handle.join().unwrap();
         }
     } else {
-        run_entropy_analysis(split_vector_arc, write_options_arc, file_arc, result_counter_arc, key_length_byte, 0, entropy_boundary);
+        run_entropy_analysis(
+            split_vector_arc,
+            write_options_arc,
+            file_arc,
+            result_counter_arc,
+            key_length_byte,
+            0,
+            entropy_boundary,
+        );
     }
 }
 
@@ -139,7 +150,13 @@ fn run_entropy_analysis(
             if calculation::entropy::has_high_entropy(entropy, entropy_boundary) {
                 let crypto_key = hex::encode(scope_vec);
                 let file_arc = Arc::clone(&file_arc);
-                output::write_ck::write(crypto_key.as_str(), entropy, key_length_byte, &write_options_arc, file_arc);
+                output::write_ck::write(
+                    crypto_key.as_str(),
+                    entropy,
+                    key_length_byte,
+                    &write_options_arc,
+                    file_arc,
+                );
                 let mut counter_lock = result_counter_arc.lock().unwrap();
                 counter_lock.increment()
             }

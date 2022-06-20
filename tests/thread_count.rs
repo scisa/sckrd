@@ -100,7 +100,16 @@ fn thread_count_range() -> TestResult {
 
     for i in 0..32 {
         Command::cargo_bin(PROG)?
-            .args(&["-i", TEST_SMALL, "-b", "500", "-n", &(i.to_string()), "-k", "128"])
+            .args(&[
+                "-i",
+                TEST_SMALL,
+                "-b",
+                "500",
+                "-n",
+                &(i.to_string()),
+                "-k",
+                "128",
+            ])
             .assert()
             .stdout(predicate::str::contains(output_00))
             .stdout(predicate::str::contains(output_01));

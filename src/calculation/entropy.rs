@@ -1,4 +1,6 @@
-use crate::util::global_constants::{DEFAULT_ENTROPY_DELTA, SMALLEST_KEY_LENGTH_BIT, GREATEST_KEY_LENGTH_BIT};
+use crate::util::global_constants::{
+    DEFAULT_ENTROPY_DELTA, GREATEST_KEY_LENGTH_BIT, SMALLEST_KEY_LENGTH_BIT,
+};
 
 pub fn calc_entropy_boundary(key_length_bit: usize, entropy_delta: f32) -> f32 {
     let key_bytes: f32 = key_length_bit as f32 / 8.0 as f32;
@@ -37,10 +39,9 @@ pub fn calc_key_length_byte(user_given_key_length_bit: usize) -> usize {
     } else {
         key_length_byte = user_given_key_length_bit / 8;
     }
-    
+
     key_length_byte
 }
-
 
 #[test]
 fn calc_entropy_boundary_256() {
@@ -114,7 +115,6 @@ fn calc_key_length_byte_byte_128() {
 fn calc_key_length_byte_byte_256() {
     assert_eq!(calc_key_length_byte(256), 256 / 8);
 }
-
 
 #[test]
 fn calc_key_length_byte_byte_512() {

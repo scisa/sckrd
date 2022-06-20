@@ -1,7 +1,7 @@
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
-use std::sync::{Mutex, Arc};
+use std::sync::{Arc, Mutex};
 
 use crate::util::error_messages::*;
 use crate::util::exit_codes::*;
@@ -15,7 +15,12 @@ pub struct WriteOptions {
 }
 
 impl WriteOptions {
-    pub fn new(is_output_file: bool, is_basic_output: bool, is_verbose: bool, is_suppress_output: bool) -> Self {
+    pub fn new(
+        is_output_file: bool,
+        is_basic_output: bool,
+        is_verbose: bool,
+        is_suppress_output: bool,
+    ) -> Self {
         Self {
             is_output_file: is_output_file,
             is_basic_output: is_basic_output,
@@ -25,11 +30,17 @@ impl WriteOptions {
     }
 }
 
-pub fn write(crypto_key: &str, entropy: f32, key_length_byte: usize, write_options: &WriteOptions, file: Arc<Mutex<File>>) {
+pub fn write(
+    crypto_key: &str,
+    entropy: f32,
+    key_length_byte: usize,
+    write_options: &WriteOptions,
+    file: Arc<Mutex<File>>,
+) {
     if !write_options.is_suppress_output {
         write_to_stdout(crypto_key, entropy, key_length_byte, &write_options);
     }
-    
+
     if write_options.is_output_file {
         write_to_file(crypto_key, entropy, file)
     }
@@ -60,18 +71,19 @@ pub fn get_file() -> File {
         .write(true)
         .append(true)
         .create(true)
-        .open(OUTPUT_FILE_PATH) {
-            Ok(file) => file,
-            Err(e) => {
-                eprintln!("{}: {}", ERROR_OUTPUT_FILE_CAN_NOT_BE_CREATED, e);
-                std::process::exit(EXIT_OUTPUT_FILE_CAN_NOT_BE_CREATED);
-            }
-        };
+        .open(OUTPUT_FILE_PATH)
+    {
+        Ok(file) => file,
+        Err(e) => {
+            eprintln!("{}: {}", ERROR_OUTPUT_FILE_CAN_NOT_BE_CREATED, e);
+            std::process::exit(EXIT_OUTPUT_FILE_CAN_NOT_BE_CREATED);
+        }
+    };
 
     file
 }
 
-fn write_to_file(crypto_key: &str, entropy: f32, file: Arc<Mutex<File>>) {  
+fn write_to_file(crypto_key: &str, entropy: f32, file: Arc<Mutex<File>>) {
     let mut file_guard = file.lock().unwrap();
     let data = format!("{}: {}\n", crypto_key, entropy);
     if let Err(e) = file_guard.write_all(data.as_bytes()) {
@@ -91,6 +103,4 @@ pub fn remove_output_file(is_output_file: bool) {
             };
         }
     }
-    
 }
-

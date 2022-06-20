@@ -193,7 +193,10 @@ impl Args {
     }
 
     fn extract_thread_count(args: &ArgMatches) -> usize {
-        let string_key = args.get_one::<String>(KEY_THREAD_COUNT).unwrap().to_string();
+        let string_key = args
+            .get_one::<String>(KEY_THREAD_COUNT)
+            .unwrap()
+            .to_string();
         match string_key.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
@@ -227,7 +230,10 @@ impl Args {
     }
 
     fn extract_entropy_delta(args: &ArgMatches) -> f32 {
-        let string_entropy_delta = args.get_one::<String>(KEY_ENTROPY_DELTA).unwrap().to_string();
+        let string_entropy_delta = args
+            .get_one::<String>(KEY_ENTROPY_DELTA)
+            .unwrap()
+            .to_string();
         match string_entropy_delta.parse::<f32>() {
             Ok(e) => e,
             Err(_) => {

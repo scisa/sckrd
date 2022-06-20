@@ -8,12 +8,7 @@ pub fn split_bytes_vector_for_threading(
     let mut split_vec: Vec<Vec<u8>> = Vec::new();
 
     if bytes.len() > key_length_byte * n && n > 1 {
-        split_up_bytes(
-            bytes,
-            &mut split_vec,
-            key_length_byte,
-            n,
-        );
+        split_up_bytes(bytes, &mut split_vec, key_length_byte, n);
     } else {
         split_vec.push(bytes.to_vec());
     }
@@ -100,7 +95,7 @@ pub fn calc_thread_count(
             thread_count /= 2;
         }
     }
-    
+
     thread_count
 }
 

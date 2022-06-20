@@ -4,9 +4,7 @@ pub struct Counter {
 
 impl Counter {
     pub fn new() -> Self {
-        return Self {
-            counter: 0,
-        }
+        return Self { counter: 0 };
     }
 
     pub fn increment(&mut self) {

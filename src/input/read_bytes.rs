@@ -1,8 +1,8 @@
 use std::fs::File;
 use std::io::{self, BufReader, Read};
 
-use crate::util::exit_codes::EXIT_READ_BYTES_TO_VECTOR_FAILED;
 use crate::util::error_messages::ERROR_READ_BYTES_TO_VECTOR_FAILED;
+use crate::util::exit_codes::EXIT_READ_BYTES_TO_VECTOR_FAILED;
 
 pub fn get_bytes(path: &str, byte_count: usize) -> Vec<u8> {
     let mut bytes: Vec<u8> = Vec::new();
@@ -19,7 +19,7 @@ pub fn get_bytes(path: &str, byte_count: usize) -> Vec<u8> {
             Err(e) => {
                 eprintln!("{}: {}", ERROR_READ_BYTES_TO_VECTOR_FAILED, e);
                 std::process::exit(EXIT_READ_BYTES_TO_VECTOR_FAILED);
-            },
+            }
         };
     }
 
@@ -45,7 +45,6 @@ fn read_specific_number_of_bytes_to_vector(path: &str, byte_count: usize) -> io:
 
     Ok(buffer)
 }
-
 
 #[test]
 fn get_specific_bytes_smaller_than_file() {

@@ -9,7 +9,6 @@ pub fn contains_no_non_hash_characters(_scope_vec: &Vec<u8>) -> bool {
     return true;
 }
 
-
 #[test]
 fn contains_no_non_hashable_characters() {
     let scope_vec: Vec<u8> = vec![15, 30, 47, 11, 9, 90, 111, 120, 35, 210];
