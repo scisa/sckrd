@@ -3,9 +3,11 @@ Search for krypto-keys in ram dumps
 
 ## Description
 This Tool is able to analyse byte dumps like ram images to find possible crypto keys.
-The criteria for beeing a "possible key" is its high entropy.
+The criteria for beeing a possible key is its high entropy.
+Bytes with a high entropy are more likely to be a real key. 
+Based on an entropy-delta, it filters out only byte sequences with in this entropy range.
 Is a byte sequence with a high entropy found, it can be printed to a file or to stdout.
-The found "possible keys" can be used for trying to decrypt encrypted files on the hard disk, where the ram image is taken from.
+The found possible keys can be used for trying to decrypt encrypted files on the hard disk, where the ram image is taken from.
 
 
 ## Installation
