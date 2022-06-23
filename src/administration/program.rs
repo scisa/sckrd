@@ -145,21 +145,19 @@ fn run_entropy_analysis(
     for j in 0..(bytes_length - key_length_byte + 1) {
         let mut scope_vec: Vec<u8> = vec![0; key_length_byte];
         scope_vec.copy_from_slice(&bytes_arc[current_thread][j..(j + key_length_byte)]);
-        if calculation::exclution::contains_no_non_hash_characters(&scope_vec) {
-            let entropy: f32 = calculation::entropy::calc_entropy_per_candidate_key(&scope_vec);
-            if calculation::entropy::has_high_entropy(entropy, entropy_boundary) {
-                let crypto_key = hex::encode(scope_vec);
-                let file_arc = Arc::clone(&file_arc);
-                output::write_ck::write(
-                    crypto_key.as_str(),
-                    entropy,
-                    key_length_byte,
-                    &write_options_arc,
-                    file_arc,
-                );
-                let mut counter_lock = result_counter_arc.lock().unwrap();
-                counter_lock.increment()
-            }
+        let entropy: f32 = calculation::entropy::calc_entropy_per_candidate_key(&scope_vec);
+        if calculation::entropy::has_high_entropy(entropy, entropy_boundary) {
+            let crypto_key = hex::encode(scope_vec);
+            let file_arc = Arc::clone(&file_arc);
+            output::write_ck::write(
+                crypto_key.as_str(),
+                entropy,
+                key_length_byte,
+                &write_options_arc,
+                file_arc,
+            );
+            let mut counter_lock = result_counter_arc.lock().unwrap();
+            counter_lock.increment()
         }
     }
 }

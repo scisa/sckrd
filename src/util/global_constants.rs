@@ -8,7 +8,7 @@ pub const APP_DESCRIPTION: &str = "search crypto keys in ram dumps";
 pub const MINIMAL_THREAD_VALUE: usize = 1;
 
 // calculation
-pub const DEFAULT_ENTROPY_DELTA: f32 = 0.4;
+pub const DEFAULT_ENTROPY_DELTA: f32 = 0.2;
 pub const SMALLEST_KEY_LENGTH_BIT: usize = 56;
 pub const GREATEST_KEY_LENGTH_BIT: usize = 1024;
 
