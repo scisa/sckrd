@@ -88,11 +88,14 @@ pub fn calc_thread_count(
     mut thread_count: usize,
     key_length_byte: usize,
 ) -> usize {
-    if thread_count == 0 {
+    if thread_count == 0 || thread_count == 1 {
         thread_count = MINIMAL_THREAD_VALUE;
     } else {
         while (bytes_length / thread_count) < key_length_byte * 2 {
             thread_count /= 2;
+            if thread_count == 1 {
+                break;
+            }
         }
     }
 
