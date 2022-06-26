@@ -13,4 +13,7 @@ pub const SMALLEST_KEY_LENGTH_BIT: usize = 56;
 pub const GREATEST_KEY_LENGTH_BIT: usize = 1024;
 
 //output
-pub const OUTPUT_FILE_PATH: &str = "./sckrd.keys";
+pub const ENV_HOME_KEY: &str = "HOME";
+pub const DEFAULT_OUTPUT_PATH: &str = ".";
+pub const OUTPUT_FOLDER: &str = "sckrd_output";
+pub const OUTPUT_FILE_NAME: &str = "sckrd.keys";

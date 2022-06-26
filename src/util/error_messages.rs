@@ -13,3 +13,4 @@ pub const ERROR_OUTPUT_FILE_CAN_NOT_BE_CREATED: &str = "Output file can not be c
 pub const ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE: &str = "Output file not writeable";
 pub const ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED: &str =
     "Existing output File can't be removed";
+pub const ERROR_OUTPUT_FOLDER_CAN_NOT_BE_CREATED: &str = "Output folder can not be created";

@@ -1,3 +1,4 @@
+use std::env;
 use std::fs::{self, File, OpenOptions};
 use std::io::Write;
 use std::path::Path;
@@ -5,7 +6,9 @@ use std::sync::{Arc, Mutex};
 
 use crate::util::error_messages::*;
 use crate::util::exit_codes::*;
-use crate::util::global_constants::OUTPUT_FILE_PATH;
+use crate::util::global_constants::{
+    DEFAULT_OUTPUT_PATH, ENV_HOME_KEY, OUTPUT_FILE_NAME, OUTPUT_FOLDER,
+};
 
 pub struct WriteOptions {
     pub is_output_file: bool,
@@ -67,11 +70,13 @@ fn write_to_stdout(
 }
 
 pub fn get_file() -> File {
+    let output_file = get_output_file();
+
     let file = match OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
-        .open(OUTPUT_FILE_PATH)
+        .open(output_file)
     {
         Ok(file) => file,
         Err(e) => {
@@ -92,9 +97,11 @@ fn write_to_file(crypto_key: &str, entropy: f32, file: Arc<Mutex<File>>) {
 }
 
 pub fn remove_output_file(is_output_file: bool) {
+    let output_file = get_output_file();
+
     if is_output_file {
-        if Path::new(OUTPUT_FILE_PATH).exists() {
-            match fs::remove_file(OUTPUT_FILE_PATH) {
+        if Path::new(&output_file).exists() {
+            match fs::remove_file(output_file) {
                 Ok(f) => f,
                 Err(e) => {
                     eprintln!("{}: {}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED, e);
@@ -103,4 +110,25 @@ pub fn remove_output_file(is_output_file: bool) {
             };
         }
     }
+}
+
+pub fn create_output_folder_if_not_exists() {
+    let output_file_path = get_output_file_path();
+    if let Err(e) = fs::create_dir_all(output_file_path) {
+        eprintln!("{}: {}", ERROR_OUTPUT_FOLDER_CAN_NOT_BE_CREATED, e);
+        std::process::exit(EXIT_OUTPUT_FOLDER_CAN_NOT_BE_CREATED);
+    };
+}
+
+fn get_output_file_path() -> String {
+    let home = match env::var(ENV_HOME_KEY) {
+        Ok(p) => p,
+        Err(_) => String::from(DEFAULT_OUTPUT_PATH),
+    };
+
+    home + "/" + OUTPUT_FOLDER
+}
+
+fn get_output_file() -> String {
+    get_output_file_path() + "/" + OUTPUT_FILE_NAME
 }

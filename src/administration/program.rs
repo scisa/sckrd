@@ -15,6 +15,11 @@ pub fn run() {
     // fetch args
     let args = Args::get_args();
 
+    // create output folder if necessary
+    if args.output_file {
+        output::write_ck::create_output_folder_if_not_exists();
+    }
+
     // initialize timer
     let timer = Timer::new();
 
