@@ -151,7 +151,8 @@ impl Args {
                     .short('b')
                     .takes_value(true)
                     .long(LONG_ARG_BYTE_COUNT)
-                    .default_value(DEFAULT_VALUE_BYTE_COUNT),
+                    .default_value(DEFAULT_VALUE_BYTE_COUNT)
+                    .conflicts_with(KEY_BUFFERSIZE),
             )
             .arg(
                 Arg::new(KEY_ENTROPY_DELTA)
@@ -171,7 +172,8 @@ impl Args {
                     .short('u')
                     .takes_value(true)
                     .long(LONG_ARG_BUFFERSIZE)
-                    .default_value(DEFAULT_VALUE_BUFFERSIZE),
+                    .default_value(DEFAULT_VALUE_BUFFERSIZE)
+                    .conflicts_with(KEY_BYTE_COUNT),
             )
             .get_matches();
         Ok(matches)
