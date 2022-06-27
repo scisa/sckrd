@@ -4,6 +4,11 @@ pub const APP_VERSION: &str = "0.1.0";
 pub const APP_AUTHOR: &str = "scisa <scisa@web.de>";
 pub const APP_DESCRIPTION: &str = "search crypto keys in ram dumps";
 
+// input
+pub const MAX_BUFFERSIZE: usize = 8;
+pub const MIN_BUFFERSIZE: usize = 1;
+pub const ONE_GIGABYTE: usize = 1024 * 1024 * 1024 * 1;
+
 // parallelism
 pub const MINIMAL_THREAD_VALUE: usize = 1;
 

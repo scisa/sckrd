@@ -19,6 +19,7 @@ pub struct Args {
     pub suppress_output: bool,
     pub byte_count: usize,
     pub entropy_delta: f32,
+    pub buffersize: usize,
 }
 
 impl Args {
@@ -44,6 +45,7 @@ impl Args {
             suppress_output: Self::extract_suppress_output(&args),
             byte_count: Self::extract_byte_count(&args),
             entropy_delta: Self::extract_entropy_delta(&args),
+            buffersize: Self::extract_buffersize(&args),
         }
     }
 
@@ -161,6 +163,16 @@ impl Args {
                     .long(LONG_ARG_ENTROPY_DELTA)
                     .default_value(DEFAULT_VALUE_ENTROPY_DELTA),
             )
+            .arg(
+                Arg::new(KEY_BUFFERSIZE)
+                    .help(HELP_BUFFERSIZE)
+                    .value_name(VALUE_BUFFERSIZE)
+                    .required(false)
+                    .short('u')
+                    .takes_value(true)
+                    .long(LONG_ARG_BUFFERSIZE)
+                    .default_value(DEFAULT_VALUE_BUFFERSIZE),
+            )
             .get_matches();
         Ok(matches)
     }
@@ -178,7 +190,7 @@ impl Args {
         match string_key.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
-                eprintln!("{}", ERROR_KEYSIZE_NOT_U32);
+                eprintln!("{}", ERROR_KEYSIZE_NOT_USIZE);
                 std::process::exit(EXIT_KEYSIZE_ARG_IS_UNSIGNED_INT)
             }
         }
@@ -200,7 +212,7 @@ impl Args {
         match string_key.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
-                eprintln!("{}", ERROR_THREAD_COUNT_NOT_U32);
+                eprintln!("{}", ERROR_THREAD_COUNT_NOT_USIZE);
                 std::process::exit(EXIT_THREAD_COUNT_ARG_IS_UNSIGNED_INT)
             }
         }
@@ -223,7 +235,7 @@ impl Args {
         match string_byte_count.parse::<usize>() {
             Ok(k) => k,
             Err(_) => {
-                eprintln!("{}", ERROR_BYTE_COUNT_NOT_U32);
+                eprintln!("{}", ERROR_BYTE_COUNT_NOT_USIZE);
                 std::process::exit(EXIT_BYTE_COUNT_ARG_IS_UNSIGNED_INT)
             }
         }
@@ -239,6 +251,17 @@ impl Args {
             Err(_) => {
                 eprintln!("{}", ERROR_ENTROPY_DELTA_NOT_F32);
                 std::process::exit(EXIT_ENTROPY_DELTA_ARG_IS_F32)
+            }
+        }
+    }
+
+    fn extract_buffersize(args: &ArgMatches) -> usize {
+        let string_buffersize = args.get_one::<String>(KEY_BUFFERSIZE).unwrap().to_string();
+        match string_buffersize.parse::<usize>() {
+            Ok(b) => b,
+            Err(_) => {
+                eprintln!("{}", ERROR_BUFFERSIZE_NOT_USIZE);
+                std::process::exit(EXIT_BUFFERSIZE_ARG_IS_UNSIGNED_INT)
             }
         }
     }

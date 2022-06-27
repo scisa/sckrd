@@ -1,5 +1,6 @@
 use hex;
 use std::fs::File;
+use std::io::{BufRead, BufReader};
 use std::sync::{Arc, Mutex};
 
 use crate::calculation;
@@ -18,6 +19,8 @@ pub fn run() {
     // create output folder if necessary
     if args.output_file {
         output::write_ck::create_output_folder_if_not_exists();
+        // recreate output.sckrd if necessary
+        output::write_ck::remove_output_file(args.output_file);
     }
 
     // initialize timer
@@ -25,11 +28,54 @@ pub fn run() {
 
     // create result counter
     let result_counter: Counter = Counter::new();
+    let result_counter_arc = Arc::new(Mutex::new(result_counter));
 
-    // fetch bytes
-    let mut bytes: Vec<u8> =
-        input::read_bytes::get_bytes(args.input_file.as_str(), args.byte_count);
+    let key_length_byte: usize = calculation::entropy::calc_key_length_byte(args.keysize);
+    let capacity: usize = input::read_bytes::calculate_capacity(args.buffersize);
+    let file = input::read_bytes::get_input_file(&args.input_file);
 
+    let mut reader = BufReader::with_capacity(capacity, file);
+    let mut overlap_vector: Vec<u8> = vec![0; key_length_byte - 1];
+
+    if args.buffersize > 0 {
+        loop {
+            let mut bytes: Vec<u8> = Vec::new();
+            let mut buffer = reader.fill_buf().unwrap().to_vec();
+
+            // concat bytes and overlap
+            bytes.append(&mut overlap_vector);
+            bytes.append(&mut buffer);
+
+            let bytes_len = bytes.len();
+            let mut overlap_vector: Vec<u8> = vec![0; key_length_byte - 1];
+
+            if bytes_len < key_length_byte {
+                break;
+            }
+
+            overlap_vector.copy_from_slice(&bytes[(bytes_len - key_length_byte + 1)..bytes_len]);
+            let result_counter_arc = result_counter_arc.clone();
+            start_analysation(&args, &mut bytes, result_counter_arc);
+
+            reader.consume(bytes_len);
+        }
+    } else {
+        // fetch bytes
+        let mut bytes: Vec<u8> =
+            input::read_bytes::get_bytes(args.input_file.as_str(), args.byte_count);
+        let result_counter_arc = result_counter_arc.clone();
+        start_analysation(&args, &mut bytes, result_counter_arc)
+    }
+
+    show_counter_if_needed(result_counter_arc, args.result_counter);
+    show_timer_if_needed(&timer, args.timer)
+}
+
+pub fn start_analysation(
+    args: &Args,
+    bytes: &mut Vec<u8>,
+    result_counter_arc: Arc<Mutex<Counter>>,
+) {
     // create helper variables
     let key_length_byte: usize = calculation::entropy::calc_key_length_byte(args.keysize);
     let bytes_length = bytes.len();
@@ -37,10 +83,6 @@ pub fn run() {
     // calc entropy boundary
     let entropy_delta = calculation::entropy::calc_entropy_delta(args.entropy_delta);
     let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize, entropy_delta);
-
-    // create smartpointer arc for counter
-    let result_counter_arc = Arc::new(Mutex::new(result_counter));
-    let result_counter_show_arc = Arc::clone(&result_counter_arc);
 
     // check if analysation has to be done
     if bytes_length >= key_length_byte {
@@ -53,13 +95,10 @@ pub fn run() {
 
         // split vector into pieces for threading
         let split_vec: Vec<Vec<u8>> = calculation::parallelism::split_bytes_vector_for_threading(
-            &mut bytes,
+            bytes,
             key_length_byte,
             thread_count,
         );
-
-        // recreate output.sckrd if necessary
-        output::write_ck::remove_output_file(args.output_file);
 
         // create write options
         let file = output::write_ck::get_file();
@@ -86,9 +125,6 @@ pub fn run() {
             entropy_boundary,
         );
     }
-
-    show_counter_if_needed(result_counter_show_arc, args.result_counter);
-    show_timer_if_needed(&timer, args.timer)
 }
 
 fn analyse_bytes_dump(

@@ -1,8 +1,11 @@
 use std::fs::File;
 use std::io::{self, BufReader, Read};
 
-use crate::util::error_messages::ERROR_READ_BYTES_TO_VECTOR_FAILED;
-use crate::util::exit_codes::EXIT_READ_BYTES_TO_VECTOR_FAILED;
+use crate::util::error_messages::{
+    ERROR_OPEN_INPUT_FILE_FAILED, ERROR_READ_BYTES_TO_VECTOR_FAILED,
+};
+use crate::util::exit_codes::{EXIT_OPEN_INPUT_FILE_FAILED, EXIT_READ_BYTES_TO_VECTOR_FAILED};
+use crate::util::global_constants::{MAX_BUFFERSIZE, MIN_BUFFERSIZE, ONE_GIGABYTE};
 
 pub fn get_bytes(path: &str, byte_count: usize) -> Vec<u8> {
     let mut bytes: Vec<u8> = Vec::new();
@@ -27,7 +30,7 @@ pub fn get_bytes(path: &str, byte_count: usize) -> Vec<u8> {
 }
 
 fn read_bytes_to_vector(path: &str) -> io::Result<Vec<u8>> {
-    let file = File::open(path)?;
+    let file = get_input_file(&String::from(path));
     let mut reader = BufReader::new(file);
     let mut buffer: Vec<u8> = Vec::new();
 
@@ -38,12 +41,35 @@ fn read_bytes_to_vector(path: &str) -> io::Result<Vec<u8>> {
 }
 
 fn read_specific_number_of_bytes_to_vector(path: &str, byte_count: usize) -> io::Result<Vec<u8>> {
-    let mut file = File::open(path)?;
+    let mut file = get_input_file(&String::from(path));
     let mut buffer: Vec<u8> = vec![0; byte_count];
 
     file.read_exact(&mut buffer)?;
 
     Ok(buffer)
+}
+
+pub fn get_input_file(file: &String) -> File {
+    let file = match File::open(file) {
+        Ok(f) => f,
+        Err(e) => {
+            eprintln!("{}: {}", ERROR_OPEN_INPUT_FILE_FAILED, e);
+            std::process::exit(EXIT_OPEN_INPUT_FILE_FAILED);
+        }
+    };
+
+    file
+}
+
+pub fn calculate_capacity(buffersize: usize) -> usize {
+    let mut buf_size = buffersize;
+    if buf_size > MAX_BUFFERSIZE {
+        buf_size = MAX_BUFFERSIZE;
+    } else if buf_size < MIN_BUFFERSIZE {
+        buf_size = MIN_BUFFERSIZE;
+    }
+
+    ONE_GIGABYTE * buf_size
 }
 
 #[test]
