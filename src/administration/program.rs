@@ -36,9 +36,10 @@ pub fn run() {
 
     let mut reader = BufReader::with_capacity(capacity, file);
     let mut overlap_vector: Vec<u8> = vec![0; key_length_byte - 1];
+    let mut byte_count = args.byte_count;
 
-    if args.buffersize > 0 {
-        loop {
+    loop {
+        if byte_count < key_length_byte {
             let mut bytes: Vec<u8> = Vec::new();
             let mut buffer = reader.fill_buf().unwrap().to_vec();
 
@@ -58,13 +59,17 @@ pub fn run() {
             start_analysation(&args, &mut bytes, result_counter_arc);
 
             reader.consume(bytes_len);
+        } else {
+            // fetch bytes
+            let mut bytes: Vec<u8> =
+                input::read_bytes::get_specific_number_of_bytes(args.input_file.as_str(), byte_count);
+            byte_count = bytes.len();
+            if byte_count > 0 {
+                let result_counter_arc = result_counter_arc.clone();
+                start_analysation(&args, &mut bytes, result_counter_arc);
+                break;
+            }
         }
-    } else {
-        // fetch bytes
-        let mut bytes: Vec<u8> =
-            input::read_bytes::get_bytes(args.input_file.as_str(), args.byte_count);
-        let result_counter_arc = result_counter_arc.clone();
-        start_analysation(&args, &mut bytes, result_counter_arc)
     }
 
     show_counter_if_needed(result_counter_arc, args.result_counter);

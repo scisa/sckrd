@@ -62,4 +62,4 @@ pub const KEY_BUFFERSIZE: &str = "buffer_size";
 pub const HELP_BUFFERSIZE: &str = "use a buffer of a defined size to read large files (size in GB; size must be smaller than available ram)";
 pub const VALUE_BUFFERSIZE: &str = "BUFFERSIZE";
 pub const LONG_ARG_BUFFERSIZE: &str = "buffer-size";
-pub const DEFAULT_VALUE_BUFFERSIZE: &str = "0";
+pub const DEFAULT_VALUE_BUFFERSIZE: &str = "2";
