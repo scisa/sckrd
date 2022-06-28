@@ -35,20 +35,25 @@ pub fn run() {
     let file = input::read_bytes::get_input_file(&args.input_file);
 
     let mut reader = BufReader::with_capacity(capacity, file);
-    let mut overlap_vector: Vec<u8> = vec![0; key_length_byte - 1];
+
+    let mut overlap_vector: Vec<u8> = Vec::new();
     let mut byte_count = args.byte_count;
 
     loop {
         if byte_count < key_length_byte {
             let mut bytes: Vec<u8> = Vec::new();
-            let mut buffer = reader.fill_buf().unwrap().to_vec();
 
-            // concat bytes and overlap
-            bytes.append(&mut overlap_vector);
-            bytes.append(&mut buffer);
+            let bytes_len = {
+                let mut buffer = reader.fill_buf().unwrap().to_vec();
 
-            let bytes_len = bytes.len();
-            let mut overlap_vector: Vec<u8> = vec![0; key_length_byte - 1];
+                // concat bytes and overlap
+                bytes.append(&mut overlap_vector);
+                bytes.append(&mut buffer);
+
+                bytes.len()
+            };
+            
+            overlap_vector = vec![0; key_length_byte - 1];
 
             if bytes_len < key_length_byte {
                 break;

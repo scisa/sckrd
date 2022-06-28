@@ -3,7 +3,7 @@ use std::io::{self, Read};
 
 use crate::util::error_messages::ERROR_OPEN_INPUT_FILE_FAILED;
 use crate::util::exit_codes::EXIT_OPEN_INPUT_FILE_FAILED;
-use crate::util::global_constants::{MAX_BUFFERSIZE, MIN_BUFFERSIZE, ONE_GIGABYTE};
+use crate::util::global_constants::{MAX_BUFFERSIZE, MIN_BUFFERSIZE, ONE_MEGABYTE};
 
 
 pub fn get_specific_number_of_bytes(path: &str, byte_count: usize) -> Vec<u8> {
@@ -45,7 +45,7 @@ pub fn calculate_capacity(buffersize: usize) -> usize {
         buf_size = MIN_BUFFERSIZE;
     }
 
-    ONE_GIGABYTE * buf_size
+    ONE_MEGABYTE * buf_size
 }
 
 #[test]

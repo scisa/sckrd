@@ -59,7 +59,7 @@ pub const LONG_ARG_ENTROPY_DELTA: &str = "entropy-delta";
 pub const DEFAULT_VALUE_ENTROPY_DELTA: &str = "0.2";
 
 pub const KEY_BUFFERSIZE: &str = "buffer_size";
-pub const HELP_BUFFERSIZE: &str = "use a buffer of a defined size to read large files (size in GB; size must be smaller than available ram)";
+pub const HELP_BUFFERSIZE: &str = "use a buffer of a defined size to read large files (size in MB between 500 and 2000)";
 pub const VALUE_BUFFERSIZE: &str = "BUFFERSIZE";
 pub const LONG_ARG_BUFFERSIZE: &str = "buffer-size";
-pub const DEFAULT_VALUE_BUFFERSIZE: &str = "2";
+pub const DEFAULT_VALUE_BUFFERSIZE: &str = "2000";
