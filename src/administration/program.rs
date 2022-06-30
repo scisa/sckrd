@@ -17,8 +17,8 @@ pub fn run() {
     let args = Args::get_args();
 
     // create output folder if necessary
+    output::write_ck::create_output_folder_if_not_exists();
     if args.output_file {
-        output::write_ck::create_output_folder_if_not_exists();
         // recreate output.sckrd if necessary
         output::write_ck::remove_output_file(args.output_file);
     }
