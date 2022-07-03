@@ -1,6 +1,6 @@
 use hex;
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::BufRead;
 use std::sync::{Arc, Mutex};
 
 use crate::calculation;
@@ -9,6 +9,7 @@ use crate::output;
 
 use crate::calculation::counter::Counter;
 use crate::cli::arguments::Args;
+use crate::input::read_bytes::ByteReader;
 use crate::output::write_ck::WriteOptions;
 use crate::time::timer::Timer;
 
@@ -17,9 +18,9 @@ pub fn run() {
     let args = Args::get_args();
 
     // create output folder if necessary
-    output::write_ck::create_output_folder_if_not_exists();
     if args.output_file {
         // recreate output.sckrd if necessary
+        output::write_ck::create_output_folder_if_not_exists();
         output::write_ck::remove_output_file(args.output_file);
     }
 
@@ -31,10 +32,7 @@ pub fn run() {
     let result_counter_arc = Arc::new(Mutex::new(result_counter));
 
     let key_length_byte: usize = calculation::entropy::calc_key_length_byte(args.keysize);
-    let capacity: usize = input::read_bytes::calculate_capacity(args.buffersize);
-    let file = input::read_bytes::get_input_file(&args.input_file);
-
-    let mut reader = BufReader::with_capacity(capacity, file);
+    let mut byte_reader = ByteReader::new(&args.input_file, args.buffersize);
 
     let mut overlap_vector: Vec<u8> = Vec::new();
     let mut byte_count = args.byte_count;
@@ -44,7 +42,7 @@ pub fn run() {
             let mut bytes: Vec<u8> = Vec::new();
 
             let bytes_len = {
-                let mut buffer = reader.fill_buf().unwrap().to_vec();
+                let mut buffer = byte_reader.reader.fill_buf().unwrap().to_vec();
 
                 // concat bytes and overlap
                 bytes.append(&mut overlap_vector);
@@ -52,7 +50,7 @@ pub fn run() {
 
                 bytes.len()
             };
-            
+
             overlap_vector = vec![0; key_length_byte - 1];
 
             if bytes_len < key_length_byte {
@@ -63,11 +61,13 @@ pub fn run() {
             let result_counter_arc = result_counter_arc.clone();
             start_analysation(&args, &mut bytes, result_counter_arc);
 
-            reader.consume(bytes_len);
+            byte_reader.reader.consume(bytes_len);
         } else {
             // fetch bytes
-            let mut bytes: Vec<u8> =
-                input::read_bytes::get_specific_number_of_bytes(args.input_file.as_str(), byte_count);
+            let mut bytes: Vec<u8> = input::read_bytes::get_specific_number_of_bytes(
+                args.input_file.as_str(),
+                byte_count,
+            );
             byte_count = bytes.len();
             if byte_count > 0 {
                 let result_counter_arc = result_counter_arc.clone();
@@ -111,7 +111,7 @@ pub fn start_analysation(
         );
 
         // create write options
-        let file = output::write_ck::get_file();
+        let file: Option<File> = output::write_ck::get_file(args.output_file);
         let write_options: WriteOptions = WriteOptions::new(
             args.output_file,
             args.basic_output,
@@ -140,7 +140,7 @@ pub fn start_analysation(
 fn analyse_bytes_dump(
     split_vector_arc: Arc<Vec<Vec<u8>>>,
     write_options_arc: Arc<WriteOptions>,
-    file_arc: Arc<Mutex<File>>,
+    file_arc: Arc<Mutex<Option<File>>>,
     result_counter_arc: Arc<Mutex<Counter>>,
     thread_count: usize,
     key_length_byte: usize,
@@ -186,7 +186,7 @@ fn analyse_bytes_dump(
 fn run_entropy_analysis(
     bytes_arc: Arc<Vec<Vec<u8>>>,
     write_options_arc: Arc<WriteOptions>,
-    file_arc: Arc<Mutex<File>>,
+    file_arc: Arc<Mutex<Option<File>>>,
     result_counter_arc: Arc<Mutex<Counter>>,
     key_length_byte: usize,
     current_thread: usize,

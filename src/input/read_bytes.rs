@@ -1,10 +1,24 @@
 use std::fs::File;
-use std::io::{self, Read};
+use std::io::{self, BufReader, Read};
 
 use crate::util::error_messages::ERROR_OPEN_INPUT_FILE_FAILED;
 use crate::util::exit_codes::EXIT_OPEN_INPUT_FILE_FAILED;
 use crate::util::global_constants::{MAX_BUFFERSIZE, MIN_BUFFERSIZE, ONE_MEGABYTE};
 
+pub struct ByteReader {
+    pub reader: BufReader<File>,
+}
+
+impl ByteReader {
+    pub fn new(file_path: &String, buffersize: usize) -> Self {
+        let file = get_input_file(file_path);
+        let capacity = calculate_capacity(buffersize);
+
+        Self {
+            reader: BufReader::with_capacity(capacity, file),
+        }
+    }
+}
 
 pub fn get_specific_number_of_bytes(path: &str, byte_count: usize) -> Vec<u8> {
     let bytes = match read_specific_number_of_bytes_to_vector(path, byte_count) {
@@ -14,7 +28,6 @@ pub fn get_specific_number_of_bytes(path: &str, byte_count: usize) -> Vec<u8> {
 
     bytes
 }
-
 
 fn read_specific_number_of_bytes_to_vector(path: &str, byte_count: usize) -> io::Result<Vec<u8>> {
     let mut file = get_input_file(&String::from(path));

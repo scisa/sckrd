@@ -38,7 +38,7 @@ pub fn write(
     entropy: f32,
     key_length_byte: usize,
     write_options: &WriteOptions,
-    file: Arc<Mutex<File>>,
+    file: Arc<Mutex<Option<File>>>,
 ) {
     if !write_options.is_suppress_output {
         write_to_stdout(crypto_key, entropy, key_length_byte, &write_options);
@@ -69,30 +69,42 @@ fn write_to_stdout(
     }
 }
 
-pub fn get_file() -> File {
-    let output_file = get_output_file();
+pub fn get_file(is_output_file: bool) -> Option<File> {
+    let mut output_file_option: Option<File> = None;
 
-    let file = match OpenOptions::new()
-        .write(true)
-        .append(true)
-        .create(true)
-        .open(output_file)
-    {
-        Ok(file) => file,
-        Err(e) => {
-            eprintln!("{}: {}", ERROR_OUTPUT_FILE_CAN_NOT_BE_CREATED, e);
-            std::process::exit(EXIT_OUTPUT_FILE_CAN_NOT_BE_CREATED);
-        }
-    };
+    if is_output_file {
+        let output_file = get_output_file();
 
-    file
+        let file = match OpenOptions::new()
+            .write(true)
+            .append(true)
+            .create(true)
+            .open(output_file)
+        {
+            Ok(file) => file,
+            Err(e) => {
+                eprintln!("{}: {}", ERROR_OUTPUT_FILE_CAN_NOT_BE_CREATED, e);
+                std::process::exit(EXIT_OUTPUT_FILE_CAN_NOT_BE_CREATED);
+            }
+        };
+
+        output_file_option = Some(file);
+    }
+
+    output_file_option
 }
 
-fn write_to_file(crypto_key: &str, entropy: f32, file: Arc<Mutex<File>>) {
-    let mut file_guard = file.lock().unwrap();
+fn write_to_file(crypto_key: &str, entropy: f32, file_option: Arc<Mutex<Option<File>>>) {
+    let mut file_guard = file_option.lock().unwrap();
     let data = format!("{}: {}\n", crypto_key, entropy);
-    if let Err(e) = file_guard.write_all(data.as_bytes()) {
-        eprintln!("{}: {}", ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE, e);
+
+    match &mut *file_guard {
+        Some(file) => {
+            if let Err(e) = file.write_all(data.as_bytes()) {
+                eprintln!("{}: {}", ERROR_OUTPUT_FILE_IS_NOT_WRITEABLE, e);
+            }
+        }
+        None => {}
     }
 }
 
