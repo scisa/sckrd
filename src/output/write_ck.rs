@@ -37,7 +37,7 @@ pub fn write(
     crypto_key: &str,
     entropy: f32,
     key_length_byte: usize,
-    write_options: &WriteOptions,
+    write_options: Arc<WriteOptions>,
     file: Arc<Mutex<Option<File>>>,
 ) {
     if !write_options.is_suppress_output {
@@ -108,28 +108,33 @@ fn write_to_file(crypto_key: &str, entropy: f32, file_option: Arc<Mutex<Option<F
     }
 }
 
-pub fn remove_output_file(is_output_file: bool) {
-    let output_file = get_output_file();
-
+pub fn recreate_output_file_folder(is_output_file: bool) {
     if is_output_file {
-        if Path::new(&output_file).exists() {
-            match fs::remove_file(output_file) {
-                Ok(f) => f,
-                Err(e) => {
-                    eprintln!("{}: {}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED, e);
-                    std::process::exit(EXIT_EXISTING_OUTPUT_FILE_CANNOT_BE_REMOVED);
-                }
-            };
-        }
+        create_output_folder_if_not_exists();
+        remove_output_file();
     }
 }
 
-pub fn create_output_folder_if_not_exists() {
+fn create_output_folder_if_not_exists() {
     let output_file_path = get_output_file_path();
     if let Err(e) = fs::create_dir_all(output_file_path) {
         eprintln!("{}: {}", ERROR_OUTPUT_FOLDER_CAN_NOT_BE_CREATED, e);
         std::process::exit(EXIT_OUTPUT_FOLDER_CAN_NOT_BE_CREATED);
     };
+}
+
+fn remove_output_file() {
+    let output_file = get_output_file();
+
+    if Path::new(&output_file).exists() {
+        match fs::remove_file(output_file) {
+            Ok(f) => f,
+            Err(e) => {
+                eprintln!("{}: {}", ERROR_EXISTING_OUTPUT_FILE_CAN_NOT_BE_REMOVED, e);
+                std::process::exit(EXIT_EXISTING_OUTPUT_FILE_CANNOT_BE_REMOVED);
+            }
+        };
+    }
 }
 
 fn get_output_file_path() -> String {

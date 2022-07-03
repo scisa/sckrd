@@ -14,27 +14,29 @@ use crate::output::write_ck::WriteOptions;
 use crate::time::timer::Timer;
 
 pub fn run() {
+    // initialize timer
+    let timer = Timer::new();
+
     // fetch args
     let args = Args::get_args();
 
-    // create output folder if necessary
-    if args.output_file {
-        // recreate output.sckrd if necessary
-        output::write_ck::create_output_folder_if_not_exists();
-        output::write_ck::remove_output_file(args.output_file);
-    }
-
-    // initialize timer
-    let timer = Timer::new();
+    // recreate output file if necessary
+    output::write_ck::recreate_output_file_folder(args.output_file);
 
     // create result counter
     let result_counter: Counter = Counter::new();
     let result_counter_arc = Arc::new(Mutex::new(result_counter));
 
+    // calc key length byte
     let key_length_byte: usize = calculation::entropy::calc_key_length_byte(args.keysize);
+
+    // init byte reader
     let mut byte_reader = ByteReader::new(&args.input_file, args.buffersize);
 
+    // create overlap
     let mut overlap_vector: Vec<u8> = Vec::new();
+
+    // get byte count from user args
     let mut byte_count = args.byte_count;
 
     loop {
@@ -90,12 +92,13 @@ pub fn start_analysation(
     let key_length_byte: usize = calculation::entropy::calc_key_length_byte(args.keysize);
     let bytes_length = bytes.len();
 
-    // calc entropy boundary
-    let entropy_delta = calculation::entropy::calc_entropy_delta(args.entropy_delta);
-    let entropy_boundary = calculation::entropy::calc_entropy_boundary(args.keysize, entropy_delta);
-
     // check if analysation has to be done
     if bytes_length >= key_length_byte {
+        // calc entropy boundary
+        let entropy_delta = calculation::entropy::calc_entropy_delta(args.entropy_delta);
+        let entropy_boundary =
+            calculation::entropy::calc_entropy_boundary(args.keysize, entropy_delta);
+
         // calculate number of parallel tasks
         let thread_count = calculation::parallelism::calc_thread_count(
             bytes_length,
@@ -147,13 +150,15 @@ fn analyse_bytes_dump(
     entropy_boundary: f32,
 ) {
     let split_vec_len: usize = split_vector_arc.len();
+
     if split_vec_len == thread_count && thread_count > 1 {
-        let mut thread_handles = vec![];
+        let mut thread_handles = Vec::new();
         for current_thread in 0..thread_count {
             let split_vector_arc = Arc::clone(&split_vector_arc);
             let write_options_arc = Arc::clone(&write_options_arc);
             let file_arc = Arc::clone(&file_arc);
             let result_counter_arc = Arc::clone(&result_counter_arc);
+
             thread_handles.push(std::thread::spawn(move || {
                 run_entropy_analysis(
                     split_vector_arc,
@@ -197,16 +202,21 @@ fn run_entropy_analysis(
         let mut scope_vec: Vec<u8> = vec![0; key_length_byte];
         scope_vec.copy_from_slice(&bytes_arc[current_thread][j..(j + key_length_byte)]);
         let entropy: f32 = calculation::entropy::calc_entropy_per_candidate_key(&scope_vec);
+
         if calculation::entropy::has_high_entropy(entropy, entropy_boundary) {
             let crypto_key = hex::encode(scope_vec);
+            
             let file_arc = Arc::clone(&file_arc);
+            let write_options_arc = Arc::clone(&write_options_arc);
+
             output::write_ck::write(
                 crypto_key.as_str(),
                 entropy,
                 key_length_byte,
-                &write_options_arc,
+                write_options_arc,
                 file_arc,
             );
+
             let mut counter_lock = result_counter_arc.lock().unwrap();
             counter_lock.increment()
         }
